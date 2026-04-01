@@ -14,11 +14,52 @@ interface Post {
   published_at: string;
 }
 
-const roadmap = [
-  "Authentication and protected admin dashboard",
-  "Post editor with autosave and markdown preview",
-  "SEO-optimized blog listing and detail pages",
-  "Supabase-backed content, tags, and categories",
+type DemoPost = {
+  id: string;
+  title: string;
+  excerpt: string;
+  category: string;
+  readTime: string;
+  trendScore: number;
+};
+
+const demoTrendingPosts: DemoPost[] = [
+  {
+    id: "demo-1",
+    title: "Why Edge AI Is Rewriting Frontend Performance in 2026",
+    excerpt:
+      "From on-device embeddings to latency budgets, this guide breaks down how teams are shipping AI features without tanking Core Web Vitals.",
+    category: "AI Engineering",
+    readTime: "7 min read",
+    trendScore: 98,
+  },
+  {
+    id: "demo-2",
+    title: "TypeScript 6 + React 20 Patterns That Actually Reduced Bugs",
+    excerpt:
+      "A production-focused playbook: stricter domain types, server boundaries, and event contracts that survived scale.",
+    category: "Frontend",
+    readTime: "9 min read",
+    trendScore: 95,
+  },
+  {
+    id: "demo-3",
+    title: "Serverless Security Checklist: 12 Mistakes We Found in Real Audits",
+    excerpt:
+      "An opinionated checklist for Next.js and Supabase teams, including token leakage traps, SSR trust boundaries, and monitoring gaps.",
+    category: "Cloud Security",
+    readTime: "11 min read",
+    trendScore: 93,
+  },
+  {
+    id: "demo-4",
+    title: "Postgres at Scale: Practical Index Strategies for Content Platforms",
+    excerpt:
+      "Index design patterns for posts, tags, and timelines with benchmark-backed tradeoffs and migration notes.",
+    category: "Data",
+    readTime: "8 min read",
+    trendScore: 91,
+  },
 ];
 
 export default function HomePage() {
@@ -36,7 +77,7 @@ export default function HomePage() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await fetch("/api/public/posts?limit=3");
+        const res = await fetch("/api/public/posts?limit=8");
         if (res.ok) {
           const data = await res.json();
           setPosts(data);
@@ -51,91 +92,130 @@ export default function HomePage() {
     fetchPosts();
   }, []);
 
+  const hasLivePosts = posts.length > 0;
+  const heroPost = hasLivePosts ? posts[0] : null;
+  const secondaryPosts = hasLivePosts ? posts.slice(1, 5) : [];
+
   return (
-    <main className="min-h-screen bg-white dark:bg-gray-950">
-      {/* Hero Section */}
-      <div className="mx-auto flex min-h-[60vh] w-full max-w-5xl flex-col justify-center px-6 py-16 sm:px-10">
-        <div className="rounded-3xl border border-emerald-100/70 bg-white/85 dark:bg-gray-900/85 dark:border-emerald-900/50 p-8 shadow-[0_16px_50px_rgba(16,32,23,0.08)] backdrop-blur sm:p-12">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-400">
-            Production Baseline
-          </p>
-          <h1 className="mt-3 text-4xl font-bold leading-tight text-slate-900 dark:text-white sm:text-5xl">
-            Human-Operated Blog Platform
-          </h1>
-          <p className="mt-6 max-w-2xl text-base leading-7 text-slate-700 dark:text-gray-300 sm:text-lg">
-            Next.js + Supabase + Vercel starter is ready. This foundation is configured for secure auth,
-            CMS-style workflows, and SEO-first publishing.
-          </p>
-
-          <div className="mt-10 grid gap-3 sm:grid-cols-2">
-            {roadmap.map((item) => (
-              <div
-                key={item}
-                className="rounded-xl border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-800 px-4 py-3 text-sm font-medium text-slate-700 dark:text-gray-300"
-              >
-                {item}
-              </div>
-            ))}
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,_#f7efe2_0%,_#ffffff_35%,_#eef4ff_100%)]">
+      <div className="mx-auto max-w-6xl px-6 py-10 sm:px-10 sm:py-12">
+        <header className="mb-10 flex flex-col gap-6 border-b border-slate-200 pb-8 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-rose-600">InfoNet Editorial</p>
+            <h1 className="mt-2 text-4xl font-black tracking-tight text-slate-900 sm:text-5xl">Tech Pulse</h1>
+            <p className="mt-3 max-w-2xl text-base text-slate-600">
+              Breaking analysis, deep engineering guides, and market-moving trends across AI, web engineering, and cloud systems.
+            </p>
           </div>
+          <Link
+            href="/blog"
+            className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-700"
+          >
+            Open Full Blog
+          </Link>
+        </header>
 
-          <div className="mt-8 flex gap-3">
+        {!postsLoading && heroPost && (
+          <section className="mb-12 grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
             <Link
-              href="/blog"
-              className="rounded-lg bg-emerald-600 px-6 py-2 font-medium text-white transition hover:bg-emerald-700"
+              href={`/blog/${heroPost.slug}`}
+              className="group rounded-2xl border border-slate-200 bg-white p-8 shadow-[0_18px_40px_rgba(25,45,80,0.08)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_50px_rgba(25,45,80,0.14)]"
             >
-              Read Blog
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">Featured Story</p>
+              <h2 className="mt-4 text-3xl font-extrabold leading-tight text-slate-900 sm:text-4xl">{heroPost.title}</h2>
+              <p className="mt-4 text-slate-600">{heroPost.excerpt || heroPost.content.substring(0, 220)}...</p>
+              <div className="mt-6 inline-flex items-center text-sm font-semibold text-blue-600">Continue reading</div>
             </Link>
-          </div>
-        </div>
-      </div>
 
-      {/* Recent Posts Section */}
-      {!postsLoading && posts.length > 0 && (
-        <div className="bg-gray-50 dark:bg-gray-900 py-16">
-          <div className="mx-auto max-w-5xl px-6 sm:px-10">
-            <div className="mb-12">
-              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Latest Posts</h2>
-              <p className="text-gray-600 dark:text-gray-400">Explore our latest blog articles</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {posts.map((post) => (
+            <div className="space-y-3">
+              {secondaryPosts.map((post) => (
                 <Link
                   key={post.id}
                   href={`/blog/${post.slug}`}
-                  className="group rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 hover:shadow-lg transition-shadow"
+                  className="block rounded-xl border border-slate-200 bg-white p-5 transition hover:border-slate-300 hover:bg-slate-50"
                 >
-                  <div className="mb-3 text-sm text-gray-600 dark:text-gray-400">
-                    {new Date(post.published_at).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-emerald-600 transition-colors mb-2">
-                    {post.title}
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2">
-                    {post.excerpt || post.content.substring(0, 100)}...
-                  </p>
-                  <div className="mt-4 text-emerald-600 dark:text-emerald-400 font-medium text-sm group-hover:translate-x-1 transition-transform">
-                    Read more →
-                  </div>
+                  <h3 className="text-lg font-bold text-slate-900">{post.title}</h3>
+                  <p className="mt-2 line-clamp-2 text-sm text-slate-600">{post.excerpt || post.content.substring(0, 120)}...</p>
                 </Link>
               ))}
             </div>
+          </section>
+        )}
 
-            <div className="mt-12 text-center">
-              <Link
-                href="/blog"
-                className="inline-block rounded-lg bg-emerald-600 px-6 py-3 font-medium text-white transition hover:bg-emerald-700"
-              >
-                View All Posts
-              </Link>
-            </div>
+        {(!hasLivePosts || postsLoading) && (
+          <section className="mb-12 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-900">
+            {postsLoading
+              ? "Loading latest posts..."
+              : "No published posts yet. Showing demo Tech trending cards below so you can visualize the homepage layout."}
+          </section>
+        )}
+
+        <section>
+          <div className="mb-5 flex items-center justify-between">
+            <h2 className="text-2xl font-extrabold text-slate-900">Trending In Tech</h2>
+            <span className="rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-rose-700">
+              Top Picks
+            </span>
           </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            {(hasLivePosts ? posts.slice(0, 4).map((post, index) => ({
+              id: post.id,
+              title: post.title,
+              excerpt: post.excerpt || post.content.substring(0, 160),
+              category: "Tech",
+              readTime: `${6 + index} min read`,
+              trendScore: 90 - index,
+              slug: post.slug,
+              live: true,
+            })) : demoTrendingPosts.map((post) => ({ ...post, slug: "", live: false }))).map((post) => (
+              post.live ? (
+                <Link
+                  key={post.id}
+                  href={`/blog/${post.slug}`}
+                  className="group rounded-xl border border-slate-200 bg-white p-5 transition hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(25,45,80,0.12)]"
+                >
+                  <div className="mb-3 flex items-center justify-between text-xs text-slate-500">
+                    <span className="rounded-full bg-slate-100 px-2 py-1 font-medium">{post.category}</span>
+                    <span>{post.readTime}</span>
+                  </div>
+                  <h3 className="text-xl font-bold leading-snug text-slate-900">{post.title}</h3>
+                  <p className="mt-3 text-sm text-slate-600">{post.excerpt}</p>
+                  <div className="mt-4 flex items-center justify-between">
+                    <span className="text-sm font-semibold text-slate-900">Trend score: {post.trendScore}</span>
+                    <span className="text-sm font-semibold text-blue-600">Read</span>
+                  </div>
+                </Link>
+              ) : (
+                <article
+                  key={post.id}
+                  className="rounded-xl border border-slate-200 bg-white p-5"
+                >
+                  <div className="mb-3 flex items-center justify-between text-xs text-slate-500">
+                    <span className="rounded-full bg-slate-100 px-2 py-1 font-medium">{post.category}</span>
+                    <span>{post.readTime}</span>
+                  </div>
+                  <h3 className="text-xl font-bold leading-snug text-slate-900">{post.title}</h3>
+                  <p className="mt-3 text-sm text-slate-600">{post.excerpt}</p>
+                  <div className="mt-4 flex items-center justify-between">
+                    <span className="text-sm font-semibold text-slate-900">Trend score: {post.trendScore}</span>
+                    <span className="rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-800">Demo</span>
+                  </div>
+                </article>
+              )
+            ))}
+          </div>
+        </section>
+
+        <div className="mt-10 text-center">
+          <Link
+            href="/blog"
+            className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-100"
+          >
+            Browse all posts
+          </Link>
         </div>
-      )}
+      </div>
     </main>
   );
 }
