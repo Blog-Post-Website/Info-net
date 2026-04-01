@@ -1,3 +1,9 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+
 const roadmap = [
   "Authentication and protected admin dashboard",
   "Post editor with autosave and markdown preview",
@@ -6,6 +12,15 @@ const roadmap = [
 ];
 
 export default function HomePage() {
+  const { user, isAdmin, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && user && isAdmin) {
+      router.push("/admin/dashboard");
+    }
+  }, [user, isAdmin, loading, router]);
+
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-5xl flex-col px-6 py-16 sm:px-10">
       <div className="rounded-3xl border border-emerald-100/70 bg-white/85 p-8 shadow-[0_16px_50px_rgba(16,32,23,0.08)] backdrop-blur sm:p-12">
@@ -27,6 +42,21 @@ export default function HomePage() {
               {item}
             </div>
           ))}
+        </div>
+
+        <div className="mt-8 flex gap-3">
+          <a
+            href="/auth/login"
+            className="rounded-lg bg-emerald-600 px-6 py-2 font-medium text-white transition hover:bg-emerald-700"
+          >
+            Admin Sign In
+          </a>
+          <a
+            href="/auth/signup"
+            className="rounded-lg border border-slate-300 px-6 py-2 font-medium text-slate-700 transition hover:bg-slate-50"
+          >
+            Sign Up
+          </a>
         </div>
       </div>
     </main>
