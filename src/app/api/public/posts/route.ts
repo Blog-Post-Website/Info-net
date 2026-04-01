@@ -1,12 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { supabase } from "@/lib/supabase/client";
 import { parsePagination } from "@/lib/api/validation";
+import { apiError, apiSuccess, createApiContext, logApiError } from "@/lib/api/response";
 
 /**
  * GET /api/public/posts
  * Get published posts (public endpoint)
  */
 export async function GET(req: NextRequest) {
+  const ctx = createApiContext(req, "GET /api/public/posts");
+
   try {
     const { searchParams } = new URL(req.url);
     const { limit, offset } = parsePagination(searchParams);
@@ -20,12 +23,9 @@ export async function GET(req: NextRequest) {
 
     if (error) throw error;
 
-    return NextResponse.json(data || []);
+    return apiSuccess(ctx, data || []);
   } catch (error) {
-    console.error("GET /api/public/posts error:", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to fetch posts" },
-      { status: 500 }
-    );
+    logApiError(ctx, error);
+    return apiError(ctx, "Failed to fetch posts", 500);
   }
 }

@@ -1,14 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { supabase } from "@/lib/supabase/client";
 import { getUserFromRequest } from "@/lib/supabase/auth";
 import { buildRateLimitKey, checkRateLimit } from "@/lib/api/rate-limit";
 import { parseJsonBody, validateUpdatePostPayload } from "@/lib/api/validation";
+import { apiError, apiSuccess, createApiContext, isValidationLikeError, logApiError } from "@/lib/api/response";
 
 /**
  * GET /api/posts/[id]
  * Get single post (published or owned by user)
  */
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const ctx = createApiContext(req, "GET /api/posts/[id]");
+
   try {
     const { id: postId } = await params;
     const user = await getUserFromRequest(req);
@@ -26,16 +29,13 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const { data, error } = await query.single();
 
     if (error || !data) {
-      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+      return apiError(ctx, "Post not found", 404);
     }
 
-    return NextResponse.json(data);
+    return apiSuccess(ctx, data);
   } catch (error) {
-    console.error("GET /api/posts/[id] error:", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to fetch post" },
-      { status: 500 }
-    );
+    logApiError(ctx, error);
+    return apiError(ctx, "Failed to fetch post", 500);
   }
 }
 
@@ -44,12 +44,14 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
  * Update post (drafts only, or publish)
  */
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const ctx = createApiContext(req, "PUT /api/posts/[id]");
+
   try {
     const { id: postId } = await params;
     const user = await getUserFromRequest(req);
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return apiError(ctx, "Unauthorized", 401);
     }
 
     const rate = checkRateLimit({
@@ -59,10 +61,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     });
 
     if (!rate.allowed) {
-      return NextResponse.json(
-        { error: "Too many update requests. Please try again later." },
-        { status: 429, headers: { "Retry-After": `${rate.retryAfterSeconds}` } }
-      );
+      return apiError(ctx, "Too many update requests. Please try again later.", 429, {
+        "Retry-After": `${rate.retryAfterSeconds}`,
+      });
     }
 
     // Verify ownership
@@ -73,11 +74,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       .single();
 
     if (fetchError || !post) {
-      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+      return apiError(ctx, "Post not found", 404);
     }
 
     if (post.user_id !== user.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+      return apiError(ctx, "Unauthorized", 403);
     }
 
     const payload = await parseJsonBody(req);
@@ -106,13 +107,13 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
     if (error) throw error;
 
-    return NextResponse.json(data);
+    return apiSuccess(ctx, data);
   } catch (error) {
-    console.error("PUT /api/posts/[id] error:", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to update post" },
-      { status: 500 }
-    );
+    logApiError(ctx, error);
+    if (isValidationLikeError(error)) {
+      return apiError(ctx, error instanceof Error ? error.message : "Invalid request payload", 400);
+    }
+    return apiError(ctx, "Failed to update post", 500);
   }
 }
 
@@ -121,12 +122,14 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
  * Soft delete (archive) post
  */
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const ctx = createApiContext(req, "DELETE /api/posts/[id]");
+
   try {
     const { id: postId } = await params;
     const user = await getUserFromRequest(req);
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return apiError(ctx, "Unauthorized", 401);
     }
 
     const rate = checkRateLimit({
@@ -136,10 +139,9 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     });
 
     if (!rate.allowed) {
-      return NextResponse.json(
-        { error: "Too many delete requests. Please try again later." },
-        { status: 429, headers: { "Retry-After": `${rate.retryAfterSeconds}` } }
-      );
+      return apiError(ctx, "Too many delete requests. Please try again later.", 429, {
+        "Retry-After": `${rate.retryAfterSeconds}`,
+      });
     }
 
     // Verify ownership
@@ -150,11 +152,11 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
       .single();
 
     if (fetchError || !post) {
-      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+      return apiError(ctx, "Post not found", 404);
     }
 
     if (post.user_id !== user.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+      return apiError(ctx, "Unauthorized", 403);
     }
 
     // Soft delete (archive)
@@ -167,12 +169,9 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
     if (error) throw error;
 
-    return NextResponse.json(data);
+    return apiSuccess(ctx, data);
   } catch (error) {
-    console.error("DELETE /api/posts/[id] error:", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to delete post" },
-      { status: 500 }
-    );
+    logApiError(ctx, error);
+    return apiError(ctx, "Failed to delete post", 500);
   }
 }

@@ -1,19 +1,22 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { supabase } from "@/lib/supabase/client";
 import { getUserFromRequest } from "@/lib/supabase/auth";
 import { buildRateLimitKey, checkRateLimit } from "@/lib/api/rate-limit";
+import { apiError, apiSuccess, createApiContext, logApiError } from "@/lib/api/response";
 
 /**
  * POST /api/posts/[id]/publish
  * Publish a draft post
  */
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const ctx = createApiContext(req, "POST /api/posts/[id]/publish");
+
   try {
     const { id: postId } = await params;
     const user = await getUserFromRequest(req);
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return apiError(ctx, "Unauthorized", 401);
     }
 
     const rate = checkRateLimit({
@@ -23,10 +26,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     });
 
     if (!rate.allowed) {
-      return NextResponse.json(
-        { error: "Too many publish requests. Please try again later." },
-        { status: 429, headers: { "Retry-After": `${rate.retryAfterSeconds}` } }
-      );
+      return apiError(ctx, "Too many publish requests. Please try again later.", 429, {
+        "Retry-After": `${rate.retryAfterSeconds}`,
+      });
     }
 
     // Verify ownership
@@ -37,15 +39,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       .single();
 
     if (fetchError || !post) {
-      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+      return apiError(ctx, "Post not found", 404);
     }
 
     if (post.user_id !== user.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+      return apiError(ctx, "Unauthorized", 403);
     }
 
     if (post.status === "published") {
-      return NextResponse.json({ error: "Post already published" }, { status: 400 });
+      return apiError(ctx, "Post already published", 400);
     }
 
     const { data, error } = await supabase
@@ -60,12 +62,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     if (error) throw error;
 
-    return NextResponse.json(data);
+    return apiSuccess(ctx, data);
   } catch (error) {
-    console.error("POST /api/posts/[id]/publish error:", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to publish post" },
-      { status: 500 }
-    );
+    logApiError(ctx, error);
+    return apiError(ctx, "Failed to publish post", 500);
   }
 }

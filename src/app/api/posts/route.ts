@@ -1,19 +1,22 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { supabase } from "@/lib/supabase/client";
 import { getUserFromRequest } from "@/lib/supabase/auth";
 import { buildRateLimitKey, checkRateLimit } from "@/lib/api/rate-limit";
 import { parseJsonBody, validateCreatePostPayload } from "@/lib/api/validation";
+import { apiError, apiSuccess, createApiContext, isValidationLikeError, logApiError } from "@/lib/api/response";
 
 /**
  * POST /api/posts
  * Create a new draft post
  */
 export async function POST(req: NextRequest) {
+  const ctx = createApiContext(req, "POST /api/posts");
+
   try {
     const user = await getUserFromRequest(req);
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return apiError(ctx, "Unauthorized", 401);
     }
 
     const rate = checkRateLimit({
@@ -23,10 +26,9 @@ export async function POST(req: NextRequest) {
     });
 
     if (!rate.allowed) {
-      return NextResponse.json(
-        { error: "Too many requests. Please try again later." },
-        { status: 429, headers: { "Retry-After": `${rate.retryAfterSeconds}` } }
-      );
+      return apiError(ctx, "Too many requests. Please try again later.", 429, {
+        "Retry-After": `${rate.retryAfterSeconds}`,
+      });
     }
 
     const payload = await parseJsonBody(req);
@@ -50,13 +52,13 @@ export async function POST(req: NextRequest) {
 
     if (error) throw error;
 
-    return NextResponse.json(data, { status: 201 });
+    return apiSuccess(ctx, data, 201);
   } catch (error) {
-    console.error("POST /api/posts error:", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to create post" },
-      { status: 500 }
-    );
+    logApiError(ctx, error);
+    if (isValidationLikeError(error)) {
+      return apiError(ctx, error instanceof Error ? error.message : "Invalid request payload", 400);
+    }
+    return apiError(ctx, "Failed to create post", 500);
   }
 }
 
@@ -65,11 +67,13 @@ export async function POST(req: NextRequest) {
  * List all posts for authenticated user (drafts, published, archived)
  */
 export async function GET(req: NextRequest) {
+  const ctx = createApiContext(req, "GET /api/posts");
+
   try {
     const user = await getUserFromRequest(req);
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return apiError(ctx, "Unauthorized", 401);
     }
 
     const { data, error } = await supabase
@@ -80,12 +84,9 @@ export async function GET(req: NextRequest) {
 
     if (error) throw error;
 
-    return NextResponse.json(data);
+    return apiSuccess(ctx, data);
   } catch (error) {
-    console.error("GET /api/posts error:", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to fetch posts" },
-      { status: 500 }
-    );
+    logApiError(ctx, error);
+    return apiError(ctx, "Failed to fetch posts", 500);
   }
 }
