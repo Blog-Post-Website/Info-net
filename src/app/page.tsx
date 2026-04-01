@@ -79,18 +79,12 @@ export default function HomePage() {
           </div>
 
           <div className="mt-8 flex gap-3">
-            <a
-              href="/auth/login"
+            <Link
+              href="/blog"
               className="rounded-lg bg-emerald-600 px-6 py-2 font-medium text-white transition hover:bg-emerald-700"
             >
-              Admin Sign In
-            </a>
-            <a
-              href="/auth/signup"
-              className="rounded-lg border border-slate-300 dark:border-gray-600 px-6 py-2 font-medium text-slate-700 dark:text-gray-300 transition hover:bg-slate-50 dark:hover:bg-gray-800"
-            >
-              Sign Up
-            </a>
+              Read Blog
+            </Link>
           </div>
         </div>
       </div>
