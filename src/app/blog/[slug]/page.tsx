@@ -1,76 +1,99 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
+import { getPublishedPostBySlug } from "@/lib/supabase/queries";
 
-interface Post {
-  id: string;
-  title: string;
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://infonet-flax.vercel.app";
+
+type Params = {
   slug: string;
-  content: string;
-  meta_description: string;
-  published_at: string;
+};
+
+export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
+  const { slug } = await params;
+
+  try {
+    const post = await getPublishedPostBySlug(slug);
+    const description = post.meta_description || post.excerpt || post.content.substring(0, 160);
+
+    return {
+      title: post.title,
+      description,
+      alternates: {
+        canonical: `/blog/${post.slug}`,
+      },
+      openGraph: {
+        type: "article",
+        title: post.title,
+        description,
+        url: `/blog/${post.slug}`,
+        publishedTime: post.published_at || post.created_at,
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: post.title,
+        description,
+      },
+    };
+  } catch {
+    return {
+      title: "Post Not Found",
+      description: "The requested blog post could not be found.",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
 }
 
-export default function BlogPostPage() {
-  const params = useParams();
-  const router = useRouter();
-  const [post, setPost] = useState<Post | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+export default async function BlogPostPage({ params }: { params: Promise<Params> }) {
+  const { slug } = await params;
 
-  const slug = params.slug as string;
+  let post: Awaited<ReturnType<typeof getPublishedPostBySlug>> | null = null;
 
-  useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        // Fetch published post by slug from public endpoint
-        const res = await fetch(`/api/public/posts/${slug}`);
-        if (res.ok) {
-          const found = await res.json();
-          setPost(found);
-        }
-      } catch (err) {
-        console.error("Error fetching post:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchPost();
-  }, [slug]);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-white dark:bg-gray-950 flex items-center justify-center">
-        <p className="text-gray-500 dark:text-gray-400">Loading...</p>
-      </div>
-    );
+  try {
+    post = await getPublishedPostBySlug(slug);
+  } catch {
+    notFound();
   }
 
   if (!post) {
-    return (
-      <div className="min-h-screen bg-white dark:bg-gray-950 flex flex-col items-center justify-center">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-          Post not found
-        </h1>
-        <Link href="/blog" className="text-blue-500 hover:text-blue-600">
-          ← Back to blog
-        </Link>
-      </div>
-    );
+    notFound();
   }
+
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.meta_description || post.excerpt || post.content.substring(0, 160),
+    datePublished: post.published_at || post.created_at,
+    dateModified: post.updated_at || post.created_at,
+    mainEntityOfPage: `${siteUrl}/blog/${post.slug}`,
+    author: {
+      "@type": "Person",
+      name: "InfoNet",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "InfoNet",
+    },
+  };
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-12 px-4">
-        <div className="max-w-2xl mx-auto">
-          <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+
+      <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-4 py-12 text-white">
+        <div className="mx-auto max-w-2xl">
+          <h1 className="mb-4 text-4xl font-bold">{post.title}</h1>
           <div className="flex items-center gap-4 text-blue-100">
-            <time dateTime={post.published_at}>
-              {new Date(post.published_at).toLocaleDateString("en-US", {
+            <time dateTime={post.published_at || post.created_at}>
+              {new Date(post.published_at || post.created_at).toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "long",
                 day: "numeric",
@@ -80,41 +103,46 @@ export default function BlogPostPage() {
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-2xl mx-auto px-4 py-12">
-        <article className="prose dark:prose-invert max-w-none">
+      <div className="mx-auto max-w-2xl px-4 py-12">
+        <article className="prose max-w-none dark:prose-invert">
           <ReactMarkdown
             components={{
               h1: ({ ...props }) => (
-                <h1 className="text-3xl font-bold mt-8 mb-4 text-gray-900 dark:text-white" {...props} />
+                <h1 className="mt-8 mb-4 text-3xl font-bold text-gray-900 dark:text-white" {...props} />
               ),
               h2: ({ ...props }) => (
-                <h2 className="text-2xl font-bold mt-6 mb-3 text-gray-900 dark:text-white" {...props} />
+                <h2 className="mt-6 mb-3 text-2xl font-bold text-gray-900 dark:text-white" {...props} />
               ),
               h3: ({ ...props }) => (
-                <h3 className="text-xl font-bold mt-5 mb-2 text-gray-900 dark:text-white" {...props} />
+                <h3 className="mt-5 mb-2 text-xl font-bold text-gray-900 dark:text-white" {...props} />
               ),
               p: ({ ...props }) => (
-                <p className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed" {...props} />
+                <p className="mb-4 leading-relaxed text-gray-700 dark:text-gray-300" {...props} />
               ),
               ul: ({ ...props }) => (
-                <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 mb-4 space-y-2" {...props} />
+                <ul className="mb-4 list-inside list-disc space-y-2 text-gray-700 dark:text-gray-300" {...props} />
               ),
               ol: ({ ...props }) => (
-                <ol className="list-decimal list-inside text-gray-700 dark:text-gray-300 mb-4 space-y-2" {...props} />
+                <ol className="mb-4 list-inside list-decimal space-y-2 text-gray-700 dark:text-gray-300" {...props} />
               ),
               li: ({ ...props }) => <li className="ml-2" {...props} />,
               blockquote: ({ ...props }) => (
                 <blockquote
-                  className="border-l-4 border-blue-500 pl-4 italic text-gray-600 dark:text-gray-400 my-4"
+                  className="my-4 border-l-4 border-blue-500 pl-4 italic text-gray-600 dark:text-gray-400"
                   {...props}
                 />
               ),
               code: (props: any) =>
                 props.inline ? (
-                  <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm font-mono" {...props} />
+                  <code
+                    className="rounded bg-gray-100 px-2 py-1 font-mono text-sm dark:bg-gray-800"
+                    {...props}
+                  />
                 ) : (
-                  <code className="block bg-gray-100 dark:bg-gray-800 p-4 rounded my-4 overflow-auto text-sm font-mono" {...props} />
+                  <code
+                    className="my-4 block overflow-auto rounded bg-gray-100 p-4 font-mono text-sm dark:bg-gray-800"
+                    {...props}
+                  />
                 ),
               pre: ({ ...props }) => <pre className="mb-4" {...props} />,
               a: ({ ...props }) => (
@@ -126,10 +154,9 @@ export default function BlogPostPage() {
           </ReactMarkdown>
         </article>
 
-        {/* Back link */}
-        <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
-          <Link href="/blog" className="text-blue-500 hover:text-blue-600 font-medium transition-colors">
-            ← Back to blog
+        <div className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-700">
+          <Link href="/blog" className="font-medium text-blue-500 transition-colors hover:text-blue-600">
+            {"<-"} Back to blog
           </Link>
         </div>
       </div>
