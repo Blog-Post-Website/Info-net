@@ -10,12 +10,18 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { signIn } = useAuth();
+  const { signIn, adminEmail } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (email.toLowerCase() !== adminEmail) {
+      setError("Only the configured admin account can sign in.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -33,6 +39,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-lg">
         <h1 className="text-2xl font-bold text-slate-900">Blog Admin</h1>
         <p className="mt-2 text-sm text-slate-600">Sign in to your account</p>
+        <p className="mt-1 text-xs text-slate-500">Admin email: {adminEmail || "not configured"}</p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>

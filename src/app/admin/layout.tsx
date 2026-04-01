@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { user, loading, signOut } = useAuth();
+  const { user, isAdmin, loading, signOut } = useAuth();
   const router = useRouter();
   const [isSigningOut, setIsSigningOut] = useState(false);
 
@@ -16,6 +16,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
   }, [user, loading, router]);
 
+  useEffect(() => {
+    const revokeNonAdminSession = async () => {
+      if (!loading && user && !isAdmin) {
+        await signOut();
+        router.push("/auth/login?error=not-admin");
+      }
+    };
+
+    void revokeNonAdminSession();
+  }, [user, isAdmin, loading, signOut, router]);
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -24,7 +35,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
-  if (!user) {
+  if (!user || !isAdmin) {
     return null;
   }
 

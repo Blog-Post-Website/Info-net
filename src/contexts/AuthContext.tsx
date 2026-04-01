@@ -6,6 +6,8 @@ import type { User } from "@supabase/supabase-js";
 
 interface AuthContextType {
   user: User | null;
+  isAdmin: boolean;
+  adminEmail: string;
   loading: boolean;
   signUp: (email: string, password: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
@@ -17,6 +19,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const adminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL ?? "").toLowerCase();
+  const isAdmin = !!user?.email && user.email.toLowerCase() === adminEmail;
 
   useEffect(() => {
     // Check current session
@@ -61,7 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, isAdmin, adminEmail, loading, signUp, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );
