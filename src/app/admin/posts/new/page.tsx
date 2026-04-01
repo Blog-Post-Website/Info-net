@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import MarkdownEditor from "@/components/MarkdownEditor";
 import { useAuth } from "@/contexts/AuthContext";
+import { authFetch } from "@/lib/auth-fetch";
 
 export default function NewPostPage() {
   const router = useRouter();
@@ -17,7 +18,7 @@ export default function NewPostPage() {
     }
 
     try {
-      const res = await fetch("/api/posts", {
+      const res = await authFetch("/api/posts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

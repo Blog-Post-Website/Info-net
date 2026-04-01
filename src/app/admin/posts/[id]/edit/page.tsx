@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import MarkdownEditor from "@/components/MarkdownEditor";
 import { useAuth } from "@/contexts/AuthContext";
+import { authFetch } from "@/lib/auth-fetch";
 
 interface Post {
   id: string;
@@ -30,13 +31,13 @@ export default function EditPostPage() {
 
     const fetchPost = async () => {
       try {
-        const res = await fetch(`/api/posts/${postId}`);
+        const res = await authFetch(`/api/posts/${postId}`);
         if (!res.ok) throw new Error("Failed to fetch post");
         const data = await res.json();
         setPost(data);
 
         // Also fetch versions
-        const versionsRes = await fetch(`/api/posts/${postId}/versions`);
+        const versionsRes = await authFetch(`/api/posts/${postId}/versions`);
         if (versionsRes.ok) {
           const versionsData = await versionsRes.json();
           setVersions(versionsData);
@@ -55,7 +56,7 @@ export default function EditPostPage() {
 
   const handleSave = async (title: string, content: string) => {
     try {
-      const res = await fetch(`/api/posts/${postId}`, {
+      const res = await authFetch(`/api/posts/${postId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, content, slug: post?.slug }),
@@ -66,7 +67,7 @@ export default function EditPostPage() {
       setPost(updated);
 
       // Refresh versions
-      const versionsRes = await fetch(`/api/posts/${postId}/versions`);
+      const versionsRes = await authFetch(`/api/posts/${postId}/versions`);
       if (versionsRes.ok) {
         const versionsData = await versionsRes.json();
         setVersions(versionsData);
@@ -79,7 +80,7 @@ export default function EditPostPage() {
 
   const handleAutoSave = async (title: string, content: string) => {
     try {
-      const res = await fetch(`/api/posts/${postId}`, {
+      const res = await authFetch(`/api/posts/${postId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, content, slug: post?.slug }),
@@ -95,7 +96,7 @@ export default function EditPostPage() {
 
   const handlePublish = async () => {
     try {
-      const res = await fetch(`/api/posts/${postId}/publish`, {
+      const res = await authFetch(`/api/posts/${postId}/publish`, {
         method: "POST",
       });
 

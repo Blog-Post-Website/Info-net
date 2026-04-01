@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMemo } from "react";
+import { authFetch } from "@/lib/auth-fetch";
 
 interface Post {
   id: string;
@@ -16,7 +17,7 @@ interface Post {
 }
 
 export default function AdminPostsPage() {
-  const { user, loading } = useAuth();
+  const { loading } = useAuth();
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "draft" | "published" | "archived">("all");
@@ -27,7 +28,7 @@ export default function AdminPostsPage() {
 
     const fetchPosts = async () => {
       try {
-        const res = await fetch("/api/posts");
+        const res = await authFetch("/api/posts");
         if (!res.ok) throw new Error("Failed to fetch posts");
         const data = await res.json();
         setPosts(data || []);
@@ -171,7 +172,7 @@ export default function AdminPostsPage() {
                       <button
                         onClick={async () => {
                           try {
-                            const res = await fetch(`/api/posts/${post.id}/publish`, {
+                            const res = await authFetch(`/api/posts/${post.id}/publish`, {
                               method: "POST",
                             });
                             if (res.ok) {
@@ -190,7 +191,7 @@ export default function AdminPostsPage() {
                       onClick={async () => {
                         if (confirm("Delete this post?")) {
                           try {
-                            const res = await fetch(`/api/posts/${post.id}`, {
+                            const res = await authFetch(`/api/posts/${post.id}`, {
                               method: "DELETE",
                             });
                             if (res.ok) {
