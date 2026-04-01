@@ -13,16 +13,26 @@ export const metadata: Metadata = {
     description: "Read the latest articles on web development, software engineering, and publishing.",
     url: "/blog",
     type: "website",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "InfoNet Blog",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Blog | InfoNet Blog",
     description: "Read the latest articles on web development, software engineering, and publishing.",
+    images: ["/opengraph-image"],
   },
 };
 
 export default async function BlogPage() {
   let posts: Awaited<ReturnType<typeof getPublishedPosts>> = [];
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://infonet-flax.vercel.app";
 
   try {
     posts = (await getPublishedPosts()) || [];
@@ -30,8 +40,36 @@ export default async function BlogPage() {
     posts = [];
   }
 
+  const blogJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    name: "InfoNet Blog",
+    description: "Read the latest articles on web development, software engineering, and publishing.",
+    url: `${siteUrl}/blog`,
+  };
+
+  const itemListJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: posts.map((post, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      url: `${siteUrl}/blog/${post.slug}`,
+      name: post.title,
+    })),
+  };
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+      />
+
       <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-4 py-12 text-white">
         <div className="mx-auto max-w-4xl">
           <h1 className="mb-4 text-4xl font-bold">Blog</h1>

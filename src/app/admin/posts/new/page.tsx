@@ -8,7 +8,6 @@ import { useAuth } from "@/contexts/AuthContext";
 export default function NewPostPage() {
   const router = useRouter();
   const { loading } = useAuth();
-  const [isSaving, setIsSaving] = useState(false);
   const [slug, setSlug] = useState("");
 
   const handleSave = async (title: string, content: string) => {
@@ -17,7 +16,6 @@ export default function NewPostPage() {
       return;
     }
 
-    setIsSaving(true);
     try {
       const res = await fetch("/api/posts", {
         method: "POST",
@@ -36,8 +34,6 @@ export default function NewPostPage() {
     } catch (err) {
       console.error("Error creating post:", err);
       alert("Failed to create post");
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -74,7 +70,7 @@ export default function NewPostPage() {
       </div>
 
       {/* Editor */}
-      <MarkdownEditor onSave={handleSave} onAutoSave={handleSave} autoSaveInterval={10000} />
+      <MarkdownEditor onSave={handleSave} autoSaveInterval={10000} />
     </div>
   );
 }

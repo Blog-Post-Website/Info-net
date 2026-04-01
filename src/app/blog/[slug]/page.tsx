@@ -29,11 +29,20 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
         description,
         url: `/blog/${post.slug}`,
         publishedTime: post.published_at || post.created_at,
+        images: [
+          {
+            url: `/blog/${post.slug}/opengraph-image`,
+            width: 1200,
+            height: 630,
+            alt: post.title,
+          },
+        ],
       },
       twitter: {
         card: "summary_large_image",
         title: post.title,
         description,
+        images: [`/blog/${post.slug}/opengraph-image`],
       },
     };
   } catch {
@@ -81,11 +90,40 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
     },
   };
 
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: siteUrl,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Blog",
+        item: `${siteUrl}/blog`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: post.title,
+        item: `${siteUrl}/blog/${post.slug}`,
+      },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
 
       <div className="bg-gradient-to-r from-blue-500 to-blue-600 px-4 py-12 text-white">

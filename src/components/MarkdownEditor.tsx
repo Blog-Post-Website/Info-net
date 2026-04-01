@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 
 interface MarkdownEditorProps {
   initialContent?: string;
   initialTitle?: string;
-  onSave?: (title: string, content: string) => void;
-  onAutoSave?: (title: string, content: string) => void;
+  onSave?: (title: string, content: string) => Promise<void> | void;
+  onAutoSave?: (title: string, content: string) => Promise<void> | void;
   autoSaveInterval?: number;
 }
 
@@ -20,37 +20,61 @@ export default function MarkdownEditor({
 }: MarkdownEditorProps) {
   const [title, setTitle] = useState(initialTitle);
   const [content, setContent] = useState(initialContent);
-  const [isSaved, setIsSaved] = useState(true);
+  const [saveState, setSaveState] = useState<"saved" | "dirty" | "saving" | "error">("saved");
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+  const lastSnapshotRef = useRef(`${initialTitle}\n${initialContent}`);
+
+  useEffect(() => {
+    setTitle(initialTitle);
+    setContent(initialContent);
+    setSaveState("saved");
+    lastSnapshotRef.current = `${initialTitle}\n${initialContent}`;
+  }, [initialTitle, initialContent]);
+
+  const runSave = useCallback(
+    async (mode: "manual" | "auto") => {
+      const handler = mode === "manual" ? onSave : onAutoSave;
+
+      if (!handler || !(title || content)) {
+        return;
+      }
+
+      setSaveState("saving");
+      try {
+        await handler(title, content);
+        setSaveState("saved");
+        setLastSavedAt(new Date());
+        lastSnapshotRef.current = `${title}\n${content}`;
+      } catch {
+        setSaveState("error");
+      }
+    },
+    [title, content, onSave, onAutoSave]
+  );
 
   // Auto-save effect
   useEffect(() => {
-    if (!onAutoSave || !autoSaveInterval) return;
+    if (!onAutoSave || !autoSaveInterval || saveState !== "dirty") return;
+
+    if (lastSnapshotRef.current === `${title}\n${content}`) {
+      return;
+    }
 
     const timeout = setTimeout(() => {
-      if (title || content) {
-        onAutoSave(title, content);
-        setIsSaved(true);
-      }
+      void runSave("auto");
     }, autoSaveInterval);
 
     return () => clearTimeout(timeout);
-  }, [title, content, onAutoSave, autoSaveInterval]);
+  }, [title, content, onAutoSave, autoSaveInterval, saveState, runSave]);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
-    setIsSaved(false);
+    setSaveState("dirty");
   };
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setContent(e.target.value);
-    setIsSaved(false);
-  };
-
-  const handleManualSave = async () => {
-    if (onSave) {
-      await onSave(title, content);
-      setIsSaved(true);
-    }
+    setSaveState("dirty");
   };
 
   return (
@@ -64,13 +88,22 @@ export default function MarkdownEditor({
           placeholder="Post title..."
           className="flex-1 px-4 py-2 text-xl font-bold border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
         />
-        <button
-          onClick={handleManualSave}
-          disabled={isSaved}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-        >
-          {isSaved ? "Saved" : "Save"}
-        </button>
+        <div className="flex items-center gap-3">
+          <p className="text-xs text-gray-600 dark:text-gray-400">
+            {saveState === "saving" && "Saving..."}
+            {saveState === "dirty" && "Unsaved changes"}
+            {saveState === "saved" && lastSavedAt && `Saved ${lastSavedAt.toLocaleTimeString()}`}
+            {saveState === "saved" && !lastSavedAt && "Ready"}
+            {saveState === "error" && "Save failed"}
+          </p>
+          <button
+            onClick={() => void runSave("manual")}
+            disabled={saveState === "saved" || saveState === "saving"}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {saveState === "saving" ? "Saving" : saveState === "saved" ? "Saved" : "Save"}
+          </button>
+        </div>
       </div>
 
       {/* Editor and Preview */}

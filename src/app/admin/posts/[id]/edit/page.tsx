@@ -77,6 +77,22 @@ export default function EditPostPage() {
     }
   };
 
+  const handleAutoSave = async (title: string, content: string) => {
+    try {
+      const res = await fetch(`/api/posts/${postId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, content, slug: post?.slug }),
+      });
+
+      if (!res.ok) throw new Error("Failed to auto-save post");
+      const updated = await res.json();
+      setPost(updated);
+    } catch (err) {
+      console.error("Error auto-saving post:", err);
+    }
+  };
+
   const handlePublish = async () => {
     try {
       const res = await fetch(`/api/posts/${postId}/publish`, {
@@ -166,7 +182,7 @@ export default function EditPostPage() {
         initialTitle={post.title}
         initialContent={post.content}
         onSave={handleSave}
-        onAutoSave={handleSave}
+        onAutoSave={handleAutoSave}
         autoSaveInterval={10000}
       />
     </div>
