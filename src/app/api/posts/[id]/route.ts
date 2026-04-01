@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase/client";
 import { getUserFromRequest } from "@/lib/supabase/auth";
+import { buildRateLimitKey, checkRateLimit } from "@/lib/api/rate-limit";
+import { parseJsonBody, validateUpdatePostPayload } from "@/lib/api/validation";
 
 /**
  * GET /api/posts/[id]
@@ -50,6 +52,19 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const rate = checkRateLimit({
+      key: buildRateLimitKey(req, `post-update:${postId}`, user.id),
+      limit: 120,
+      windowMs: 60 * 60 * 1000,
+    });
+
+    if (!rate.allowed) {
+      return NextResponse.json(
+        { error: "Too many update requests. Please try again later." },
+        { status: 429, headers: { "Retry-After": `${rate.retryAfterSeconds}` } }
+      );
+    }
+
     // Verify ownership
     const { data: post, error: fetchError } = await supabase
       .from("posts")
@@ -65,7 +80,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
-    const updates = await req.json();
+    const payload = await parseJsonBody(req);
+    const updates = validateUpdatePostPayload(payload);
 
     // Create version snapshot before updating
     await supabase.from("post_versions").insert([
@@ -111,6 +127,19 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const rate = checkRateLimit({
+      key: buildRateLimitKey(req, "post-delete", user.id),
+      limit: 20,
+      windowMs: 60 * 60 * 1000,
+    });
+
+    if (!rate.allowed) {
+      return NextResponse.json(
+        { error: "Too many delete requests. Please try again later." },
+        { status: 429, headers: { "Retry-After": `${rate.retryAfterSeconds}` } }
+      );
     }
 
     // Verify ownership

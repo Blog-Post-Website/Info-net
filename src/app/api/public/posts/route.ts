@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase/client";
+import { parsePagination } from "@/lib/api/validation";
 
 /**
  * GET /api/public/posts
@@ -8,8 +9,7 @@ import { supabase } from "@/lib/supabase/client";
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const limit = parseInt(searchParams.get("limit") || "100");
-    const offset = parseInt(searchParams.get("offset") || "0");
+    const { limit, offset } = parsePagination(searchParams);
 
     const { data, error } = await supabase
       .from("posts")

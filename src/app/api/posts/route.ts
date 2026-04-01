@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase/client";
 import { getUserFromRequest } from "@/lib/supabase/auth";
+import { buildRateLimitKey, checkRateLimit } from "@/lib/api/rate-limit";
+import { parseJsonBody, validateCreatePostPayload } from "@/lib/api/validation";
 
 /**
  * POST /api/posts
@@ -14,11 +16,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { title, content = "", slug, excerpt = "", meta_description = "" } = await req.json();
+    const rate = checkRateLimit({
+      key: buildRateLimitKey(req, "post-create", user.id),
+      limit: 20,
+      windowMs: 60 * 60 * 1000,
+    });
 
-    if (!title || !slug) {
-      return NextResponse.json({ error: "Title and slug required" }, { status: 400 });
+    if (!rate.allowed) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429, headers: { "Retry-After": `${rate.retryAfterSeconds}` } }
+      );
     }
+
+    const payload = await parseJsonBody(req);
+    const { title, content, slug, excerpt, meta_description } = validateCreatePostPayload(payload);
 
     const { data, error } = await supabase
       .from("posts")

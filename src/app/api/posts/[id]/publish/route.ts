@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase/client";
 import { getUserFromRequest } from "@/lib/supabase/auth";
+import { buildRateLimitKey, checkRateLimit } from "@/lib/api/rate-limit";
 
 /**
  * POST /api/posts/[id]/publish
@@ -13,6 +14,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const rate = checkRateLimit({
+      key: buildRateLimitKey(req, "post-publish", user.id),
+      limit: 60,
+      windowMs: 60 * 60 * 1000,
+    });
+
+    if (!rate.allowed) {
+      return NextResponse.json(
+        { error: "Too many publish requests. Please try again later." },
+        { status: 429, headers: { "Retry-After": `${rate.retryAfterSeconds}` } }
+      );
     }
 
     // Verify ownership

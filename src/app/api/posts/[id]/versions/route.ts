@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase/client";
 import { getUserFromRequest } from "@/lib/supabase/auth";
+import { buildRateLimitKey, checkRateLimit } from "@/lib/api/rate-limit";
+import { parseJsonBody, validateVersionPayload } from "@/lib/api/validation";
 
 /**
  * GET /api/posts/[id]/versions
@@ -58,6 +60,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const rate = checkRateLimit({
+      key: buildRateLimitKey(req, `post-versions:${postId}`, user.id),
+      limit: 180,
+      windowMs: 60 * 60 * 1000,
+    });
+
+    if (!rate.allowed) {
+      return NextResponse.json(
+        { error: "Too many version save requests. Please try again later." },
+        { status: 429, headers: { "Retry-After": `${rate.retryAfterSeconds}` } }
+      );
+    }
+
     // Verify ownership
     const { data: post } = await supabase
       .from("posts")
@@ -69,7 +84,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
-    const { title, content } = await req.json();
+    const payload = await parseJsonBody(req);
+    const { title, content } = validateVersionPayload(payload);
 
     const { data, error } = await supabase.from("post_versions").insert([
       {
