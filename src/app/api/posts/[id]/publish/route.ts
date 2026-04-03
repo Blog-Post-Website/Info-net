@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
-import { supabase } from "@/lib/supabase/client";
-import { getUserFromRequest } from "@/lib/supabase/auth";
+import { createSupabaseServerClient } from "@/lib/supabase/server-client";
+import { getAccessTokenFromRequest, getUserFromRequest } from "@/lib/supabase/auth";
 import { buildRateLimitKey, checkRateLimit } from "@/lib/api/rate-limit";
 import { apiError, apiSuccess, createApiContext, logApiError } from "@/lib/api/response";
 
@@ -13,11 +13,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   try {
     const { id: postId } = await params;
+    const accessToken = getAccessTokenFromRequest(req);
     const user = await getUserFromRequest(req);
 
     if (!user) {
       return apiError(ctx, "Unauthorized", 401);
     }
+
+    const supabase = createSupabaseServerClient(accessToken);
 
     const rate = checkRateLimit({
       key: buildRateLimitKey(req, "post-publish", user.id),
@@ -34,7 +37,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     // Verify ownership
     const { data: post, error: fetchError } = await supabase
       .from("posts")
-      .select("user_id, status")
+      .select("id, user_id, status")
       .eq("id", postId)
       .single();
 

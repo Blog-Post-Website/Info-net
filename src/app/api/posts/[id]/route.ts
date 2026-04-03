@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
-import { supabase } from "@/lib/supabase/client";
-import { getUserFromRequest } from "@/lib/supabase/auth";
+import { createSupabaseServerClient } from "@/lib/supabase/server-client";
+import { getAccessTokenFromRequest, getUserFromRequest } from "@/lib/supabase/auth";
 import { buildRateLimitKey, checkRateLimit } from "@/lib/api/rate-limit";
 import { parseJsonBody, validateUpdatePostPayload } from "@/lib/api/validation";
 import { apiError, apiSuccess, createApiContext, isValidationLikeError, logApiError } from "@/lib/api/response";
@@ -14,7 +14,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
   try {
     const { id: postId } = await params;
+    const accessToken = getAccessTokenFromRequest(req);
     const user = await getUserFromRequest(req);
+
+    const supabase = createSupabaseServerClient(accessToken);
 
     let query = supabase.from("posts").select("*").eq("id", postId);
 
@@ -48,11 +51,14 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
   try {
     const { id: postId } = await params;
+    const accessToken = getAccessTokenFromRequest(req);
     const user = await getUserFromRequest(req);
 
     if (!user) {
       return apiError(ctx, "Unauthorized", 401);
     }
+
+    const supabase = createSupabaseServerClient(accessToken);
 
     const rate = checkRateLimit({
       key: buildRateLimitKey(req, `post-update:${postId}`, user.id),
@@ -126,11 +132,14 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
   try {
     const { id: postId } = await params;
+    const accessToken = getAccessTokenFromRequest(req);
     const user = await getUserFromRequest(req);
 
     if (!user) {
       return apiError(ctx, "Unauthorized", 401);
     }
+
+    const supabase = createSupabaseServerClient(accessToken);
 
     const rate = checkRateLimit({
       key: buildRateLimitKey(req, "post-delete", user.id),

@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
-import { supabase } from "@/lib/supabase/client";
-import { getUserFromRequest } from "@/lib/supabase/auth";
+import { createSupabaseServerClient } from "@/lib/supabase/server-client";
+import { getAccessTokenFromRequest, getUserFromRequest } from "@/lib/supabase/auth";
 import { buildRateLimitKey, checkRateLimit } from "@/lib/api/rate-limit";
 import { parseJsonBody, validateCreatePostPayload } from "@/lib/api/validation";
 import { apiError, apiSuccess, createApiContext, isValidationLikeError, logApiError } from "@/lib/api/response";
@@ -13,11 +13,14 @@ export async function POST(req: NextRequest) {
   const ctx = createApiContext(req, "POST /api/posts");
 
   try {
+    const accessToken = getAccessTokenFromRequest(req);
     const user = await getUserFromRequest(req);
 
     if (!user) {
       return apiError(ctx, "Unauthorized", 401);
     }
+
+    const supabase = createSupabaseServerClient(accessToken);
 
     const rate = checkRateLimit({
       key: buildRateLimitKey(req, "post-create", user.id),
@@ -70,11 +73,14 @@ export async function GET(req: NextRequest) {
   const ctx = createApiContext(req, "GET /api/posts");
 
   try {
+    const accessToken = getAccessTokenFromRequest(req);
     const user = await getUserFromRequest(req);
 
     if (!user) {
       return apiError(ctx, "Unauthorized", 401);
     }
+
+    const supabase = createSupabaseServerClient(accessToken);
 
     const { data, error } = await supabase
       .from("posts")

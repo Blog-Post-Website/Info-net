@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { supabase } from "@/lib/supabase/client";
 
-function extractBearerToken(req: NextRequest): string | null {
+export function getAccessTokenFromRequest(req: NextRequest): string | null {
   const authHeader = req.headers.get("authorization");
   if (!authHeader?.startsWith("Bearer ")) {
     return null;
@@ -11,7 +11,7 @@ function extractBearerToken(req: NextRequest): string | null {
 }
 
 export async function getUserFromRequest(req: NextRequest) {
-  const token = extractBearerToken(req);
+  const token = getAccessTokenFromRequest(req);
   if (!token) return null;
 
   const {
