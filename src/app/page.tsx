@@ -110,6 +110,8 @@ const featuredTiles = [
   "bg-[linear-gradient(135deg,#92400e_0%,#f59e0b_100%)]",
 ];
 
+const contactEmail = "online.upskill.dev@gmail.com";
+
 export default function HomePage() {
   const { user, isAdmin, loading } = useAuth();
   const router = useRouter();
@@ -233,9 +235,12 @@ export default function HomePage() {
                 className="w-28 bg-transparent text-sm outline-none placeholder:text-slate-400 sm:w-36"
               />
             </form>
-            <button className="hidden rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 sm:inline-flex">
+            <Link
+              href={`mailto:${contactEmail}?subject=InfoNet%20Subscribe%20Request`}
+              className="hidden rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 sm:inline-flex"
+            >
               Subscribe
-            </button>
+            </Link>
           </div>
         </div>
       </header>
@@ -249,7 +254,12 @@ export default function HomePage() {
               </Link>
             ))}
           </div>
-          <button className="rounded-full bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white">Subscribe</button>
+          <Link
+            href={`mailto:${contactEmail}?subject=InfoNet%20Subscribe%20Request`}
+            className="rounded-full bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white"
+          >
+            Subscribe
+          </Link>
         </div>
 
         <section className="grid gap-6 xl:grid-cols-[minmax(0,1.7fr)_minmax(320px,0.9fr)]">
@@ -374,15 +384,14 @@ export default function HomePage() {
               <p className="mt-3 text-sm leading-6 text-slate-300">
                 Join readers who want concise, high-signal updates on engineering, AI, security, and product strategy.
               </p>
-              <div className="mt-5 flex gap-2">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="w-full rounded-xl border border-slate-600 bg-slate-800 px-4 py-3 text-sm text-white placeholder:text-slate-400 focus:outline-none"
-                />
-                <button className="rounded-xl bg-emerald-500 px-4 py-3 text-sm font-bold text-slate-900 transition hover:bg-emerald-400">
-                  Subscribe
-                </button>
+              <div className="mt-5 flex flex-wrap items-center gap-3">
+                <Link
+                  href={`mailto:${contactEmail}?subject=InfoNet%20Subscribe%20Request`}
+                  className="rounded-xl bg-emerald-500 px-5 py-3 text-sm font-bold text-slate-900 transition hover:bg-emerald-400"
+                >
+                  Subscribe via email
+                </Link>
+                <p className="text-xs text-slate-400">Send a message to {contactEmail}</p>
               </div>
             </section>
 
@@ -439,13 +448,14 @@ export default function HomePage() {
             </div>
             <div>
               <p className="text-sm font-bold uppercase tracking-[0.12em] text-slate-400">Stay Updated</p>
-              <div className="mt-3 flex gap-2">
-                <input
-                  type="email"
-                  placeholder="Email"
-                  className="w-full rounded-xl border border-slate-600 bg-slate-800 px-3 py-3 text-sm placeholder:text-slate-500"
-                />
-                <button className="rounded-xl bg-emerald-500 px-3 py-3 text-sm font-bold text-slate-900">Go</button>
+              <div className="mt-3 flex flex-col gap-2">
+                <Link
+                  href={`mailto:${contactEmail}?subject=InfoNet%20Subscribe%20Request`}
+                  className="rounded-xl bg-emerald-500 px-3 py-3 text-center text-sm font-bold text-slate-900 transition hover:bg-emerald-400"
+                >
+                  Email to subscribe
+                </Link>
+                <p className="text-xs text-slate-400">{contactEmail}</p>
               </div>
             </div>
           </div>

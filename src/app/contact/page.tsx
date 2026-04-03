@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+const contactEmail = "online.upskill.dev@gmail.com";
+
 export const metadata: Metadata = {
   title: "Contact",
   description: "Get in touch with the InfoNet editorial team.",
@@ -9,17 +11,17 @@ export const metadata: Metadata = {
 const contactMethods = [
   {
     label: "Editorial",
-    value: "editorial@infonet.dev",
+    value: contactEmail,
     note: "For article ideas, corrections, and contributor pitches.",
   },
   {
     label: "Business",
-    value: "business@infonet.dev",
+    value: contactEmail,
     note: "For partnerships, sponsorships, and media inquiries.",
   },
   {
     label: "Support",
-    value: "support@infonet.dev",
+    value: contactEmail,
     note: "For account, access, or site issues.",
   },
 ];
@@ -40,7 +42,12 @@ export default function ContactPage() {
             {contactMethods.map((method) => (
               <div key={method.label} className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">{method.label}</p>
-                <p className="mt-2 text-lg font-bold text-slate-900">{method.value}</p>
+                <a
+                  className="mt-2 block text-lg font-bold text-slate-900 transition hover:text-blue-600"
+                  href={`mailto:${method.value}`}
+                >
+                  {method.value}
+                </a>
                 <p className="mt-2 text-sm leading-6 text-slate-600">{method.note}</p>
               </div>
             ))}
