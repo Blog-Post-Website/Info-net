@@ -142,7 +142,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
       </div>
 
       <div className="mx-auto max-w-2xl px-4 py-12">
-        <article className="prose max-w-none dark:prose-invert">
+        <article className="prose max-w-none dark:prose-invert prose-a:no-underline">
           <ReactMarkdown
             components={{
               h1: ({ ...props }) => (

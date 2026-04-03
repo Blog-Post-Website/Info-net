@@ -22,3 +22,16 @@ a:active,
 a:visited {
   text-decoration: none !important;
 }
+
+/* Override Tailwind prose underlines */
+.prose a,
+.prose a:hover,
+.prose-invert a,
+.prose-invert a:hover {
+  text-decoration: none !important;
+}
+
+/* Force all links everywhere to have no underline */
+[class*="prose"] a {
+  text-decoration: none !important;
+}
