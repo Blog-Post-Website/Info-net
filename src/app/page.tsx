@@ -266,7 +266,7 @@ export default function HomePage() {
         </div>
 
         <section className="grid gap-6 xl:grid-cols-[minmax(0,2.8fr)_minmax(320px,0.85fr)]">
-          <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-[0_18px_45px_rgba(15,23,42,0.08)] sm:p-5">
+          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-[0_18px_45px_rgba(15,23,42,0.08)] sm:p-5">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-3xl font-black tracking-tight sm:text-4xl">Featured Article</h2>
               <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
@@ -316,7 +316,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <aside className="rounded-3xl border border-slate-200 bg-white p-5 shadow-[0_18px_45px_rgba(15,23,42,0.08)] sm:p-6">
+          <aside className="rounded-xl border border-slate-200 bg-white p-5 shadow-[0_18px_45px_rgba(15,23,42,0.08)] sm:p-6">
             <div className="mb-5 flex items-center justify-between">
               <h3 className="text-3xl font-black tracking-tight">Top Stories</h3>
               <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Now</span>
