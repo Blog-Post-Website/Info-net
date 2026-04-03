@@ -274,48 +274,44 @@ export default function HomePage() {
               </span>
             </div>
 
-            <div className="grid gap-4 lg:grid-cols-3 lg:grid-rows-2">
-              {featuredStories.map((story, index) => {
-                const isHero = index === 0;
-                return (
-                  <article
-                    key={story.id}
-                    className={`overflow-hidden rounded-2xl border border-slate-200 bg-white ${
-                      isHero ? "lg:col-span-2 lg:row-span-2" : ""
-                    }`}
-                  >
-                    <div className={`relative ${isHero ? "h-72" : "h-40"} ${featuredTiles[index % featuredTiles.length]}`}>
-                      <div className="absolute inset-0 bg-black/15" />
-                      <div className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-700">
-                        {story.category}
-                      </div>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {featuredStories.map((story, index) => (
+                <article key={story.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                  <div className={`relative h-40 ${featuredTiles[index % featuredTiles.length]}`}>
+                    <div className="absolute inset-0 bg-black/15" />
+                    <div className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-700">
+                      {story.category}
                     </div>
-                    <div className={`p-4 ${isHero ? "sm:p-6" : ""}`}>
-                      <div className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.1em] text-slate-500">
-                        <span>{story.date}</span>
-                        <span>•</span>
-                        <span>{story.readTime}</span>
-                      </div>
-                      {renderStoryLink(
-                        story,
-                        `${isHero ? "text-3xl sm:text-4xl" : "text-xl"} block font-black leading-tight transition hover:text-blue-600`
+                  </div>
+
+                  <div className="p-4">
+                    <div className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.1em] text-slate-500">
+                      <span>{story.date}</span>
+                      <span>•</span>
+                      <span>{story.readTime}</span>
+                    </div>
+
+                    {renderStoryLink(story, "block text-lg font-bold leading-snug transition hover:text-blue-600")}
+
+                    <p className="mt-2 text-sm text-slate-600">{story.excerpt}</p>
+
+                    <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-slate-700">
+                      {story.live ? (
+                        <FormLink href={`/blog/${story.slug}`} className="transition hover:text-blue-700">
+                          Learn more
+                        </FormLink>
+                      ) : (
+                        <span>Learn more</span>
                       )}
-                      <p className={`mt-3 text-slate-600 ${isHero ? "max-w-2xl text-base" : "text-sm"}`}>
-                        {story.excerpt}
-                      </p>
-                      <div className="mt-5">
-                        {story.live ? (
-                          <FormLink href={`/blog/${story.slug}`} className="text-sm font-semibold text-blue-600 transition hover:text-blue-700">
-                            Read article
-                          </FormLink>
-                        ) : (
-                          <span className="text-sm font-semibold text-blue-600">Demo story</span>
-                        )}
-                      </div>
+                      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-slate-900">
+                        <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current stroke-[2]" aria-hidden="true">
+                          <path d="M9 18 15 12 9 6" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </span>
                     </div>
-                  </article>
-                );
-              })}
+                  </div>
+                </article>
+              ))}
             </div>
           </div>
 
