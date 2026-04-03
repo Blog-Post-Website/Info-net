@@ -6,13 +6,27 @@ import MarkdownEditor from "@/components/MarkdownEditor";
 import { useAuth } from "@/contexts/AuthContext";
 import { authFetch } from "@/lib/auth-fetch";
 
+function normalizeSlug(raw: string) {
+  const base = raw
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_]+/g, "-")
+    .replace(/[^a-z0-9-]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return base.length > 120 ? base.slice(0, 120).replace(/-+$/g, "") : base;
+}
+
 export default function NewPostPage() {
   const router = useRouter();
   const { loading } = useAuth();
   const [slug, setSlug] = useState("");
 
   const handleSave = async (title: string, content: string) => {
-    if (!title || !slug) {
+    const normalizedSlug = normalizeSlug(slug);
+
+    if (!title || !normalizedSlug) {
       alert("Please enter a title and slug");
       return;
     }
@@ -24,17 +38,28 @@ export default function NewPostPage() {
         body: JSON.stringify({
           title,
           content,
-          slug: slug.toLowerCase().replace(/\s+/g, "-"),
+          slug: normalizedSlug,
         }),
       });
 
-      if (!res.ok) throw new Error("Failed to create post");
+      if (!res.ok) {
+        let message = "Failed to create post";
+        try {
+          const data = (await res.json()) as { error?: unknown };
+          if (typeof data?.error === "string" && data.error.trim()) {
+            message = data.error;
+          }
+        } catch {
+          // ignore
+        }
+        throw new Error(message);
+      }
 
       const post = await res.json();
       router.push(`/admin/posts/${post.id}/edit`);
     } catch (err) {
       console.error("Error creating post:", err);
-      alert("Failed to create post");
+      alert(err instanceof Error ? err.message : "Failed to create post");
     }
   };
 
@@ -71,10 +96,11 @@ export default function NewPostPage() {
           <input
             type="text"
             value={slug}
-            onChange={(e) => setSlug(e.target.value)}
+            onChange={(e) => setSlug(normalizeSlug(e.target.value))}
             placeholder="my-first-post"
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
           />
+          <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">Use lowercase letters, numbers, and hyphens only.</p>
         </div>
 
         {/* Editor */}
