@@ -213,7 +213,7 @@ export default function HomePage() {
 
           <nav className="hidden flex-1 items-center justify-center gap-7 text-sm font-medium text-slate-700 lg:flex">
             {navLinks.map((link) => (
-              <Link key={link.label} href={link.href} className="no-underline transition hover:text-slate-900 hover:no-underline">
+              <Link key={link.label} href={link.href} className="no-underline transition hover:text-blue-600 hover:no-underline">
                 {link.label}
               </Link>
             ))}
@@ -240,7 +240,7 @@ export default function HomePage() {
             </form>
             <Link
               href={`mailto:${contactEmail}?subject=InfoNet%20Subscribe%20Request`}
-              className="hidden rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white no-underline transition hover:bg-slate-700 hover:no-underline sm:inline-flex"
+              className="hidden rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white no-underline transition hover:bg-blue-700 hover:no-underline sm:inline-flex"
             >
               Subscribe Now
             </Link>
@@ -252,7 +252,7 @@ export default function HomePage() {
         <div className="mb-5 flex items-center justify-between border-b border-slate-200 pb-3 text-sm text-slate-600 lg:hidden">
           <div className="flex flex-wrap gap-3">
             {navLinks.map((link) => (
-              <Link key={link.label} href={link.href} className="font-medium no-underline hover:text-slate-900 hover:no-underline">
+              <Link key={link.label} href={link.href} className="font-medium no-underline hover:text-blue-600 hover:no-underline">
                 {link.label}
               </Link>
             ))}

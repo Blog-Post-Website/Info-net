@@ -15,10 +15,10 @@ body {
   color: #102017;
 }
 
-a {
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: none;
+a,
+a:hover,
+a:focus,
+a:active,
+a:visited {
+  text-decoration: none !important;
 }
