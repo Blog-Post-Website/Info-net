@@ -12,6 +12,7 @@ interface Post {
   excerpt: string;
   content: string;
   published_at: string;
+  featured_image_url?: string | null;
 }
 
 type Story = {
@@ -24,6 +25,7 @@ type Story = {
   slug: string;
   live: boolean;
   rank: number;
+  imageUrl?: string | null;
 };
 
 const navLinks = [
@@ -42,6 +44,7 @@ const demoStories: Omit<Story, "slug" | "live" | "rank">[] = [
     category: "AI Engineering",
     readTime: "7 min read",
     date: "Apr 03, 2026",
+    imageUrl: null,
   },
   {
     id: "demo-2",
@@ -50,6 +53,7 @@ const demoStories: Omit<Story, "slug" | "live" | "rank">[] = [
     category: "Frontend",
     readTime: "9 min read",
     date: "Apr 02, 2026",
+    imageUrl: null,
   },
   {
     id: "demo-3",
@@ -58,6 +62,7 @@ const demoStories: Omit<Story, "slug" | "live" | "rank">[] = [
     category: "Cloud Security",
     readTime: "11 min read",
     date: "Apr 01, 2026",
+    imageUrl: null,
   },
   {
     id: "demo-4",
@@ -66,6 +71,7 @@ const demoStories: Omit<Story, "slug" | "live" | "rank">[] = [
     category: "Data",
     readTime: "8 min read",
     date: "Mar 31, 2026",
+    imageUrl: null,
   },
   {
     id: "demo-5",
@@ -74,6 +80,7 @@ const demoStories: Omit<Story, "slug" | "live" | "rank">[] = [
     category: "Security",
     readTime: "6 min read",
     date: "Mar 31, 2026",
+    imageUrl: null,
   },
   {
     id: "demo-6",
@@ -82,6 +89,7 @@ const demoStories: Omit<Story, "slug" | "live" | "rank">[] = [
     category: "Leadership",
     readTime: "5 min read",
     date: "Mar 30, 2026",
+    imageUrl: null,
   },
   {
     id: "demo-7",
@@ -90,6 +98,7 @@ const demoStories: Omit<Story, "slug" | "live" | "rank">[] = [
     category: "Open Source",
     readTime: "6 min read",
     date: "Mar 29, 2026",
+    imageUrl: null,
   },
   {
     id: "demo-8",
@@ -98,6 +107,7 @@ const demoStories: Omit<Story, "slug" | "live" | "rank">[] = [
     category: "Design",
     readTime: "4 min read",
     date: "Mar 28, 2026",
+    imageUrl: null,
   },
 ];
 
@@ -154,6 +164,7 @@ export default function HomePage() {
         slug: post.slug,
         live: true,
         rank: index + 1,
+        imageUrl: post.featured_image_url ?? null,
       }))
     : demoStories.map((story, index) => ({
         ...story,
@@ -271,7 +282,15 @@ export default function HomePage() {
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {featuredStories.map((story, index) => (
                 <article key={story.id} className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-                  <div className={`relative h-40 ${featuredTiles[index % featuredTiles.length]}`}>
+                  <div className={`relative h-40 ${story.imageUrl ? "bg-slate-900" : featuredTiles[index % featuredTiles.length]}`}>
+                    {story.imageUrl ? (
+                      <img
+                        src={story.imageUrl}
+                        alt=""
+                        className="absolute inset-0 h-full w-full object-cover"
+                        loading="lazy"
+                      />
+                    ) : null}
                     <div className="absolute inset-0 bg-black/15" />
                     <div className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-700">
                       {story.category}
@@ -325,15 +344,24 @@ export default function HomePage() {
                         InfoNet • {story.date}
                       </p>
                     </div>
-                    <div
-                      className={`h-16 w-16 rounded-xl ${
-                        index % 3 === 0
-                          ? "bg-[linear-gradient(120deg,#0369a1_0%,#22d3ee_100%)]"
-                          : index % 3 === 1
-                            ? "bg-[linear-gradient(120deg,#be123c_0%,#fb7185_100%)]"
-                            : "bg-[linear-gradient(120deg,#334155_0%,#94a3b8_100%)]"
-                      }`}
-                    />
+                    {story.imageUrl ? (
+                      <img
+                        src={story.imageUrl}
+                        alt=""
+                        className="h-16 w-16 rounded-xl object-cover"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div
+                        className={`h-16 w-16 rounded-xl ${
+                          index % 3 === 0
+                            ? "bg-[linear-gradient(120deg,#0369a1_0%,#22d3ee_100%)]"
+                            : index % 3 === 1
+                              ? "bg-[linear-gradient(120deg,#be123c_0%,#fb7185_100%)]"
+                              : "bg-[linear-gradient(120deg,#334155_0%,#94a3b8_100%)]"
+                        }`}
+                      />
+                    )}
                   </div>
                 </article>
               ))}
@@ -356,15 +384,24 @@ export default function HomePage() {
             <div className="space-y-4">
               {(searchQuery ? filteredLatest : latestStories).map((story, index) => (
                 <article key={story.id} className="grid gap-4 border-b border-slate-100 pb-4 last:border-0 last:pb-0 sm:grid-cols-[140px_1fr]">
-                  <div
-                    className={`h-24 rounded-2xl ${
-                      index % 3 === 0
-                        ? "bg-[linear-gradient(120deg,#0369a1_0%,#22d3ee_100%)]"
-                        : index % 3 === 1
-                          ? "bg-[linear-gradient(120deg,#be123c_0%,#fb7185_100%)]"
-                          : "bg-[linear-gradient(120deg,#334155_0%,#94a3b8_100%)]"
-                    }`}
-                  />
+                  {story.imageUrl ? (
+                    <img
+                      src={story.imageUrl}
+                      alt=""
+                      className="h-24 w-full rounded-2xl object-cover"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div
+                      className={`h-24 rounded-2xl ${
+                        index % 3 === 0
+                          ? "bg-[linear-gradient(120deg,#0369a1_0%,#22d3ee_100%)]"
+                          : index % 3 === 1
+                            ? "bg-[linear-gradient(120deg,#be123c_0%,#fb7185_100%)]"
+                            : "bg-[linear-gradient(120deg,#334155_0%,#94a3b8_100%)]"
+                      }`}
+                    />
+                  )}
                   <div>
                     {renderStoryLink(story, "text-2xl font-black leading-tight transition hover:text-blue-600")}
                     <p className="mt-2 text-sm text-slate-600">{story.excerpt}</p>

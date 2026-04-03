@@ -22,6 +22,7 @@ export default function NewPostPage() {
   const router = useRouter();
   const { loading } = useAuth();
   const [slug, setSlug] = useState("");
+  const [featuredImageUrl, setFeaturedImageUrl] = useState("");
 
   const handleSave = async (title: string, content: string) => {
     const normalizedSlug = normalizeSlug(slug);
@@ -39,6 +40,7 @@ export default function NewPostPage() {
           title,
           content,
           slug: normalizedSlug,
+          featured_image_url: featuredImageUrl.trim() || null,
         }),
       });
 
@@ -101,6 +103,21 @@ export default function NewPostPage() {
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
           />
           <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">Use lowercase letters, numbers, and hyphens only.</p>
+        </div>
+
+        {/* Thumbnail / Featured Image */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Thumbnail Image URL (optional)
+          </label>
+          <input
+            type="url"
+            value={featuredImageUrl}
+            onChange={(e) => setFeaturedImageUrl(e.target.value)}
+            placeholder="https://..."
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+          />
+          <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">Use a direct http(s) image URL (jpg/png/webp).</p>
         </div>
 
         {/* Editor */}

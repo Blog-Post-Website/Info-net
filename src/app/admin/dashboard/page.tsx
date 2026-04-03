@@ -42,7 +42,7 @@ export default function AdminDashboard() {
       {/* Header */}
       <div className="border-b border-slate-200 bg-white px-8 py-6">
         <h2 className="text-2xl font-bold text-slate-900">Dashboard</h2>
-        <p className="mt-1 text-sm text-slate-600">Welcome back! Here's what's happening with your blog.</p>
+        <p className="mt-1 text-sm text-slate-600">Welcome back! Here&apos;s what&apos;s happening with your blog.</p>
       </div>
 
       {/* Content */}

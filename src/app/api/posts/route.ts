@@ -71,7 +71,8 @@ export async function POST(req: NextRequest) {
     }
 
     const payload = await parseJsonBody(req);
-    const { title, content, slug, excerpt, meta_description } = validateCreatePostPayload(payload);
+    const { title, content, slug, excerpt, meta_description, featured_image_url } =
+      validateCreatePostPayload(payload);
 
     const { data, error } = await supabase
       .from("posts")
@@ -82,6 +83,7 @@ export async function POST(req: NextRequest) {
           content,
           slug,
           excerpt,
+          featured_image_url,
           meta_description,
           status: "draft",
         },

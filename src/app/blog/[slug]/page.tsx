@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
+import type { ComponentPropsWithoutRef } from "react";
 import { getPublishedPostBySlug } from "@/lib/supabase/queries";
 import FormLink from "@/components/FormLink";
 
@@ -8,6 +9,10 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://infonet-flax.vercel
 
 type Params = {
   slug: string;
+};
+
+type MarkdownCodeProps = ComponentPropsWithoutRef<"code"> & {
+  inline?: boolean;
 };
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
@@ -174,7 +179,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                   {...props}
                 />
               ),
-              code: (props: any) =>
+              code: (props: MarkdownCodeProps) =>
                 props.inline ? (
                   <code
                     className="rounded bg-gray-100 px-2 py-1 font-mono text-sm dark:bg-gray-800"

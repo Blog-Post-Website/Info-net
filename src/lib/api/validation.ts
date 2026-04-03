@@ -6,6 +6,7 @@ type ValidatedPostPayload = {
   slug: string;
   excerpt: string;
   meta_description: string;
+  featured_image_url: string | null;
 };
 
 type ValidatedPostUpdatePayload = Partial<ValidatedPostPayload>;
@@ -20,6 +21,7 @@ const CONTENT_MAX = 100000;
 const SLUG_MAX = 120;
 const EXCERPT_MAX = 320;
 const META_DESCRIPTION_MAX = 320;
+const FEATURED_IMAGE_URL_MAX = 2048;
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -28,6 +30,27 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 function sanitizeText(value: unknown, defaultValue = ""): string {
   if (typeof value !== "string") return defaultValue;
   return value.trim();
+}
+
+function isValidHttpUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+function sanitizeFeaturedImageUrl(value: unknown): string | null {
+  const url = sanitizeText(value);
+  if (!url) return null;
+  if (url.length > FEATURED_IMAGE_URL_MAX) {
+    throw new Error(`Featured image URL must be <= ${FEATURED_IMAGE_URL_MAX} characters`);
+  }
+  if (!isValidHttpUrl(url)) {
+    throw new Error("Featured image URL must be a valid http(s) URL");
+  }
+  return url;
 }
 
 export function isValidSlug(slug: string): boolean {
@@ -52,6 +75,7 @@ export function validateCreatePostPayload(input: unknown): ValidatedPostPayload 
   const slug = sanitizeText(input.slug).toLowerCase();
   const excerpt = sanitizeText(input.excerpt);
   const meta_description = sanitizeText(input.meta_description);
+  const featured_image_url = sanitizeFeaturedImageUrl(input.featured_image_url);
 
   if (!title) throw new Error("Title is required");
   if (!slug) throw new Error("Slug is required");
@@ -64,7 +88,7 @@ export function validateCreatePostPayload(input: unknown): ValidatedPostPayload 
     throw new Error(`Meta description must be <= ${META_DESCRIPTION_MAX} characters`);
   }
 
-  return { title, content, slug, excerpt, meta_description };
+  return { title, content, slug, excerpt, meta_description, featured_image_url };
 }
 
 export function validateUpdatePostPayload(input: unknown): ValidatedPostUpdatePayload {
@@ -72,7 +96,14 @@ export function validateUpdatePostPayload(input: unknown): ValidatedPostUpdatePa
     throw new Error("Invalid payload");
   }
 
-  const allowedFields = new Set(["title", "content", "slug", "excerpt", "meta_description"]);
+  const allowedFields = new Set([
+    "title",
+    "content",
+    "slug",
+    "excerpt",
+    "meta_description",
+    "featured_image_url",
+  ]);
   const incomingFields = Object.keys(input);
 
   if (incomingFields.length === 0) {
@@ -119,6 +150,10 @@ export function validateUpdatePostPayload(input: unknown): ValidatedPostUpdatePa
       throw new Error(`Meta description must be <= ${META_DESCRIPTION_MAX} characters`);
     }
     updates.meta_description = meta_description;
+  }
+
+  if ("featured_image_url" in input) {
+    updates.featured_image_url = sanitizeFeaturedImageUrl(input.featured_image_url);
   }
 
   return updates;

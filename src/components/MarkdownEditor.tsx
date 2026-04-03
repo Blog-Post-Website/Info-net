@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import type { ComponentPropsWithoutRef } from "react";
 import ReactMarkdown from "react-markdown";
 
 interface MarkdownEditorProps {
@@ -24,12 +25,9 @@ export default function MarkdownEditor({
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const lastSnapshotRef = useRef(`${initialTitle}\n${initialContent}`);
 
-  useEffect(() => {
-    setTitle(initialTitle);
-    setContent(initialContent);
-    setSaveState("saved");
-    lastSnapshotRef.current = `${initialTitle}\n${initialContent}`;
-  }, [initialTitle, initialContent]);
+  type MarkdownCodeProps = ComponentPropsWithoutRef<"code"> & {
+    inline?: boolean;
+  };
 
   const runSave = useCallback(
     async (mode: "manual" | "auto") => {
@@ -151,7 +149,7 @@ export default function MarkdownEditor({
                     blockquote: ({ ...props }) => (
                       <blockquote className="border-l-4 border-gray-300 pl-4 italic my-4" {...props} />
                     ),
-                    code: (props: any) =>
+                    code: (props: MarkdownCodeProps) =>
                       props.inline ? (
                         <code className="bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-sm" {...props} />
                       ) : (

@@ -10,7 +10,7 @@ export default function SignupSuccessPage() {
 
         <h1 className="mt-4 text-2xl font-bold text-slate-900">Check Your Email</h1>
         <p className="mt-2 text-slate-600">
-          We've sent you a confirmation link. Please check your email and click the link to activate your account.
+          We&apos;ve sent you a confirmation link. Please check your email and click the link to activate your account.
         </p>
 
         <p className="mt-6 text-sm text-slate-500">

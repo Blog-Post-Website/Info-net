@@ -13,7 +13,14 @@ interface Post {
   slug: string;
   status: "draft" | "published" | "archived";
   published_at: string | null;
+  featured_image_url?: string | null;
 }
+
+type PostVersion = {
+  id: string;
+  title: string;
+  created_at: string;
+};
 
 export default function EditPostPage() {
   const params = useParams();
@@ -22,7 +29,8 @@ export default function EditPostPage() {
   const [post, setPost] = useState<Post | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showVersions, setShowVersions] = useState(false);
-  const [versions, setVersions] = useState<any[]>([]);
+  const [versions, setVersions] = useState<PostVersion[]>([]);
+  const [featuredImageUrl, setFeaturedImageUrl] = useState("");
 
   const postId = params.id as string;
 
@@ -35,12 +43,13 @@ export default function EditPostPage() {
         if (!res.ok) throw new Error("Failed to fetch post");
         const data = await res.json();
         setPost(data);
+        setFeaturedImageUrl(typeof data?.featured_image_url === "string" ? data.featured_image_url : "");
 
         // Also fetch versions
         const versionsRes = await authFetch(`/api/posts/${postId}/versions`);
         if (versionsRes.ok) {
-          const versionsData = await versionsRes.json();
-          setVersions(versionsData);
+          const versionsData = (await versionsRes.json()) as unknown;
+          setVersions(Array.isArray(versionsData) ? (versionsData as PostVersion[]) : []);
         }
       } catch (err) {
         console.error("Error fetching post:", err);
@@ -59,7 +68,12 @@ export default function EditPostPage() {
       const res = await authFetch(`/api/posts/${postId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, content, slug: post?.slug }),
+        body: JSON.stringify({
+          title,
+          content,
+          slug: post?.slug,
+          featured_image_url: featuredImageUrl.trim() || null,
+        }),
       });
 
       if (!res.ok) throw new Error("Failed to update post");
@@ -83,7 +97,12 @@ export default function EditPostPage() {
       const res = await authFetch(`/api/posts/${postId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, content, slug: post?.slug }),
+        body: JSON.stringify({
+          title,
+          content,
+          slug: post?.slug,
+          featured_image_url: featuredImageUrl.trim() || null,
+        }),
       });
 
       if (!res.ok) throw new Error("Failed to auto-save post");
@@ -186,6 +205,21 @@ export default function EditPostPage() {
             )}
           </div>
         )}
+
+        {/* Thumbnail / Featured Image */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Thumbnail Image URL (optional)
+          </label>
+          <input
+            type="url"
+            value={featuredImageUrl}
+            onChange={(e) => setFeaturedImageUrl(e.target.value)}
+            placeholder="https://..."
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+          />
+          <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">Saved to the post as its thumbnail/featured image.</p>
+        </div>
 
         {/* Editor */}
         <MarkdownEditor
