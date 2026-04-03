@@ -265,7 +265,7 @@ export default function HomePage() {
           </FormLink>
         </div>
 
-        <section className="grid gap-6 xl:grid-cols-[minmax(0,2.1fr)_minmax(380px,1fr)]">
+        <section className="grid gap-6 xl:grid-cols-[minmax(0,2.8fr)_minmax(320px,0.85fr)]">
           <div className="rounded-[28px] border border-slate-200 bg-white p-4 shadow-[0_18px_45px_rgba(15,23,42,0.08)] sm:p-5">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-3xl font-black tracking-tight sm:text-4xl">Featured Article</h2>
@@ -344,7 +344,7 @@ export default function HomePage() {
           </aside>
         </section>
 
-        <section className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,2.1fr)_minmax(380px,1fr)]">
+        <section className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,2.8fr)_minmax(320px,0.85fr)]">
           <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-[0_18px_45px_rgba(15,23,42,0.08)] sm:p-6">
             <div className="mb-5 flex items-center justify-between">
               <div>
