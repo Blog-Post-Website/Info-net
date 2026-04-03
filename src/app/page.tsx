@@ -206,14 +206,14 @@ export default function HomePage() {
       <header className="border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-2xl font-black tracking-tight text-slate-900 no-underline hover:no-underline">
+            <Link href="/" className="text-2xl font-black tracking-tight text-slate-900">
               InfoNet
             </Link>
           </div>
 
           <nav className="hidden flex-1 items-center justify-center gap-7 text-sm font-medium text-slate-700 lg:flex">
             {navLinks.map((link) => (
-              <Link key={link.label} href={link.href} className="no-underline transition hover:text-blue-600 hover:no-underline">
+              <Link key={link.label} href={link.href} className="transition hover:text-blue-600">
                 {link.label}
               </Link>
             ))}
@@ -240,7 +240,7 @@ export default function HomePage() {
             </form>
             <Link
               href={`mailto:${contactEmail}?subject=InfoNet%20Subscribe%20Request`}
-              className="hidden rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white no-underline transition hover:bg-blue-700 hover:no-underline sm:inline-flex"
+              className="hidden rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 sm:inline-flex"
             >
               Subscribe Now
             </Link>
@@ -252,14 +252,14 @@ export default function HomePage() {
         <div className="mb-5 flex items-center justify-between border-b border-slate-200 pb-3 text-sm text-slate-600 lg:hidden">
           <div className="flex flex-wrap gap-3">
             {navLinks.map((link) => (
-              <Link key={link.label} href={link.href} className="font-medium no-underline hover:text-blue-600 hover:no-underline">
+              <Link key={link.label} href={link.href} className="font-medium transition hover:text-blue-600">
                 {link.label}
               </Link>
             ))}
           </div>
           <Link
             href={`mailto:${contactEmail}?subject=InfoNet%20Subscribe%20Request`}
-            className="rounded-full bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white no-underline hover:no-underline"
+            className="rounded-full bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700"
           >
             Subscribe Now
           </Link>
@@ -351,7 +351,7 @@ export default function HomePage() {
                 <h3 className="text-3xl font-black tracking-tight">Latest News</h3>
                 <p className="mt-2 text-sm text-slate-500">Fresh posts and editor notes from the desk</p>
               </div>
-              <Link href="/blog" className="rounded-full border border-slate-300 px-3 py-1.5 text-sm font-semibold hover:bg-slate-50">
+              <Link href="/blog" className="rounded-full border border-slate-300 px-3 py-1.5 text-sm font-semibold transition hover:bg-slate-50">
                 See all
               </Link>
             </div>

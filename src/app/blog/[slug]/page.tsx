@@ -184,7 +184,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                 ),
               pre: ({ ...props }) => <pre className="mb-4" {...props} />,
               a: ({ ...props }) => (
-                <a className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer" {...props} />
+                <a className="text-blue-500" target="_blank" rel="noopener noreferrer" {...props} />
               ),
             }}
           >

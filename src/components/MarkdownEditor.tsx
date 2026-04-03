@@ -132,7 +132,7 @@ export default function MarkdownEditor({
           </div>
           <div className="flex-1 overflow-auto p-4 bg-white dark:bg-gray-900">
             {content ? (
-              <article className="prose dark:prose-invert max-w-none prose-a:text-blue-500 hover:prose-a:underline">
+              <article className="prose dark:prose-invert max-w-none prose-a:text-blue-500">
                 <ReactMarkdown
                   components={{
                     h1: ({ ...props }) => (
@@ -159,7 +159,7 @@ export default function MarkdownEditor({
                       ),
                     pre: ({ ...props }) => <pre className="mb-4" {...props} />,
                     a: ({ ...props }) => (
-                      <a className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer" {...props} />
+                      <a className="text-blue-500" target="_blank" rel="noopener noreferrer" {...props} />
                     ),
                   }}
                 >
