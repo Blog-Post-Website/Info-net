@@ -60,75 +60,78 @@ export default function AdminPostsPage() {
 
   if (loading || isLoading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <p className="text-gray-500">Loading posts...</p>
+      <div className="p-8">
+        <div className="flex h-96 items-center justify-center">
+          <p className="text-gray-500">Loading posts...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Posts</h1>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            {stats.total} total • {stats.published} published • {stats.drafts} drafts
-          </p>
+    <div className="p-8">
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Posts</h1>
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+              {stats.total} total • {stats.published} published • {stats.drafts} drafts
+            </p>
+          </div>
+          <FormLink href="/admin/posts/new" className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+            New Post
+          </FormLink>
         </div>
-        <FormLink href="/admin/posts/new" className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-          New Post
-        </FormLink>
-      </div>
 
-      {/* Search and Filter */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <input
-          type="text"
-          placeholder="Search posts..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-        />
-        <div className="flex gap-2">
-          {(["all", "draft", "published", "archived"] as const).map((status) => (
-            <button
-              key={status}
-              onClick={() => setFilter(status)}
-              className={`px-4 py-2 rounded-lg capitalize transition-colors ${
-                filter === status
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-              }`}
-            >
-              {status}
-            </button>
-          ))}
+        {/* Search and Filter */}
+        <div className="flex flex-col sm:flex-row gap-4">
+          <input
+            type="text"
+            placeholder="Search posts..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+          />
+          <div className="flex gap-2">
+            {(["all", "draft", "published", "archived"] as const).map((status) => (
+              <button
+                key={status}
+                onClick={() => setFilter(status)}
+                className={`px-4 py-2 rounded-lg capitalize transition-colors ${
+                  filter === status
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                }`}
+              >
+                {status}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Posts Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="border-b border-gray-300 dark:border-gray-600">
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
-                Title
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
-                Slug
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
-                Status
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
-                Updated
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
-                Actions
-              </th>
-            </tr>
-          </thead>
+        {/* Posts Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="border-b border-gray-300 dark:border-gray-600">
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  Title
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  Slug
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  Status
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  Updated
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  Actions
+                </th>
+              </tr>
+            </thead>
           <tbody>
             {filteredPosts.length > 0 ? (
               filteredPosts.map((post) => (
@@ -215,6 +218,7 @@ export default function AdminPostsPage() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );
