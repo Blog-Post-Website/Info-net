@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
@@ -23,11 +23,12 @@ type Story = {
   date: string;
   slug: string;
   live: boolean;
+  rank: number;
 };
 
-const navCategories = ["World", "AI", "Business", "Tech", "Science", "Security", "Culture"];
+const navLinks = ["World", "AI", "Business", "Tech", "Science", "Security", "Culture"];
 
-const demoStories: Omit<Story, "slug" | "live">[] = [
+const demoStories: Omit<Story, "slug" | "live" | "rank">[] = [
   {
     id: "demo-1",
     title: "Why Edge AI Is Rewriting Frontend Performance in 2026",
@@ -77,6 +78,31 @@ const demoStories: Omit<Story, "slug" | "live">[] = [
     readTime: "5 min read",
     date: "Mar 30, 2026",
   },
+  {
+    id: "demo-7",
+    title: "The Next Wave of Open Source Infrastructure Is Smaller and Sharper",
+    excerpt: "A look at how lean maintainers are reshaping the ecosystem with opinionated toolchains.",
+    category: "Open Source",
+    readTime: "6 min read",
+    date: "Mar 29, 2026",
+  },
+  {
+    id: "demo-8",
+    title: "Design Systems Are Becoming Content Systems",
+    excerpt: "Editorial teams now want components that can carry both brand and publishing logic.",
+    category: "Design",
+    readTime: "4 min read",
+    date: "Mar 28, 2026",
+  },
+];
+
+const featuredTiles = [
+  "bg-[linear-gradient(135deg,#0f172a_0%,#1d4ed8_55%,#38bdf8_100%)]",
+  "bg-[linear-gradient(135deg,#7c3aed_0%,#c4b5fd_100%)]",
+  "bg-[linear-gradient(135deg,#0f766e_0%,#34d399_100%)]",
+  "bg-[linear-gradient(135deg,#be123c_0%,#fb7185_100%)]",
+  "bg-[linear-gradient(135deg,#334155_0%,#94a3b8_100%)]",
+  "bg-[linear-gradient(135deg,#92400e_0%,#f59e0b_100%)]",
 ];
 
 export default function HomePage() {
@@ -84,6 +110,7 @@ export default function HomePage() {
   const router = useRouter();
   const [posts, setPosts] = useState<Post[]>([]);
   const [postsLoading, setPostsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     if (!loading && user && isAdmin) {
@@ -116,7 +143,7 @@ export default function HomePage() {
         id: post.id,
         title: post.title,
         excerpt: post.excerpt || post.content.substring(0, 170),
-        category: navCategories[index % navCategories.length] || "Tech",
+        category: navLinks[index % navLinks.length] || "Tech",
         readTime: `${5 + (index % 6)} min read`,
         date: new Date(post.published_at).toLocaleDateString("en-US", {
           month: "short",
@@ -125,13 +152,26 @@ export default function HomePage() {
         }),
         slug: post.slug,
         live: true,
+        rank: index + 1,
       }))
-    : demoStories.map((story) => ({ ...story, slug: "", live: false }));
+    : demoStories.map((story, index) => ({
+        ...story,
+        slug: "",
+        live: false,
+        rank: index + 1,
+      }));
 
-  const featured = stories[0];
-  const topStories = stories.slice(0, 4);
-  const trendingStories = stories.slice(1, 4);
-  const latestStories = stories.slice(4, 10);
+  const featuredStories = useMemo(() => stories.slice(0, 6), [stories]);
+  const topStories = useMemo(() => stories.slice(0, 4), [stories]);
+  const trendingStories = useMemo(() => stories.slice(1, 7), [stories]);
+  const latestStories = useMemo(() => stories.slice(4, 10), [stories]);
+
+  const filteredLatest = searchQuery
+    ? latestStories.filter((story) => {
+        const q = searchQuery.toLowerCase();
+        return story.title.toLowerCase().includes(q) || story.excerpt.toLowerCase().includes(q);
+      })
+    : latestStories;
 
   const renderStoryLink = (story: Story, className: string) => {
     if (!story.live) {
@@ -145,120 +185,167 @@ export default function HomePage() {
     );
   };
 
+  const handleSearchSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/blog?search=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      router.push("/blog");
+    }
+  };
+
   return (
-    <main className="min-h-screen bg-[#f6f7fb] text-slate-900">
-      <div className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-5 sm:px-10 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-center gap-4">
-            <p className="text-2xl font-black tracking-tight">InfoNet</p>
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-600">
+    <main className="min-h-screen bg-[#f3f4f6] text-slate-900">
+      <header className="border-b border-slate-200 bg-white/95 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3">
+            <Link href="/" className="text-2xl font-black tracking-tight text-slate-900">
+              InfoNet
+            </Link>
+            <span className="hidden rounded-lg border border-slate-300 bg-slate-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 md:inline-flex">
               Daily Tech Desk
             </span>
           </div>
-          <div className="flex flex-wrap items-center gap-2 text-sm">
-            {navCategories.map((category) => (
-              <span key={category} className="rounded-md px-3 py-1 text-slate-600 transition hover:bg-slate-100">
-                {category}
-              </span>
+
+          <nav className="hidden flex-1 items-center justify-center gap-7 text-sm font-medium text-slate-700 lg:flex">
+            {navLinks.map((link) => (
+              <Link key={link} href={`/blog?category=${encodeURIComponent(link)}`} className="transition hover:text-slate-900">
+                {link}
+              </Link>
             ))}
+          </nav>
+
+          <div className="ml-auto flex items-center gap-3">
+            <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-1.5 shadow-sm">
+              <button type="submit" className="text-slate-500 transition hover:text-slate-900" aria-label="Search blog">
+                <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current stroke-[2]">
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="m20 20-3.5-3.5" />
+                </svg>
+              </button>
+              <input
+                type="search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search"
+                className="w-28 bg-transparent text-sm outline-none placeholder:text-slate-400 sm:w-36"
+              />
+            </form>
+            <button className="hidden rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 sm:inline-flex">
+              Subscribe
+            </button>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="mx-auto max-w-6xl px-6 pb-16 pt-8 sm:px-10">
-        <section className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
-          <div className="rounded-2xl border border-slate-200 bg-white shadow-[0_14px_36px_rgba(15,23,42,0.08)]">
-            <div className="h-64 rounded-t-2xl bg-[linear-gradient(120deg,#0f172a_0%,#1d4ed8_45%,#38bdf8_100%)] sm:h-72" />
-            <div className="p-7">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-blue-600">Featured Analysis</p>
-              <h2 className="mt-3 text-3xl font-black leading-tight sm:text-4xl">
-                {featured ? featured.title : "How AI, Security, and Cloud Costs Are Colliding in 2026"}
-              </h2>
-              <p className="mt-4 max-w-3xl text-slate-600">
-                {featured
-                  ? `${featured.excerpt}...`
-                  : "An editorial look at the biggest strategic shift in modern software teams, and what engineering leaders are changing right now."}
-              </p>
-              <div className="mt-6 flex items-center gap-4 text-sm text-slate-500">
-                <span>By InfoNet Desk</span>
-                <span>•</span>
-                <span>{featured ? featured.date : "Apr 03, 2026"}</span>
-              </div>
-              <div className="mt-6">
-                <Link
-                  href={featured?.live ? `/blog/${featured.slug}` : "/blog"}
-                  className="inline-flex items-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700"
-                >
-                  Read feature
-                </Link>
-              </div>
+      <div className="mx-auto max-w-7xl px-4 pb-16 pt-6 sm:px-6 lg:px-8">
+        <div className="mb-5 flex items-center justify-between border-b border-slate-200 pb-3 text-sm text-slate-600 lg:hidden">
+          <div className="flex flex-wrap gap-3">
+            {navLinks.slice(0, 4).map((link) => (
+              <Link key={link} href={`/blog?category=${encodeURIComponent(link)}`} className="font-medium hover:text-slate-900">
+                {link}
+              </Link>
+            ))}
+          </div>
+          <button className="rounded-full bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white">Subscribe</button>
+        </div>
+
+        <section className="grid gap-6 xl:grid-cols-[minmax(0,1.7fr)_minmax(320px,0.9fr)]">
+          <div className="rounded-[28px] border border-slate-200 bg-white p-4 shadow-[0_18px_45px_rgba(15,23,42,0.08)] sm:p-5">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-3xl font-black tracking-tight sm:text-4xl">Featured Article</h2>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                Editorial grid
+              </span>
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-3 lg:grid-rows-2">
+              {featuredStories.map((story, index) => {
+                const isHero = index === 0;
+                return (
+                  <article
+                    key={story.id}
+                    className={`overflow-hidden rounded-2xl border border-slate-200 bg-white ${
+                      isHero ? "lg:col-span-2 lg:row-span-2" : ""
+                    }`}
+                  >
+                    <div className={`relative ${isHero ? "h-72" : "h-40"} ${featuredTiles[index % featuredTiles.length]}`}>
+                      <div className="absolute inset-0 bg-black/15" />
+                      <div className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-700">
+                        {story.category}
+                      </div>
+                    </div>
+                    <div className={`p-4 ${isHero ? "sm:p-6" : ""}`}>
+                      <div className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.1em] text-slate-500">
+                        <span>{story.date}</span>
+                        <span>•</span>
+                        <span>{story.readTime}</span>
+                      </div>
+                      {renderStoryLink(
+                        story,
+                        `${isHero ? "text-3xl sm:text-4xl" : "text-xl"} block font-black leading-tight transition hover:text-blue-600`
+                      )}
+                      <p className={`mt-3 text-slate-600 ${isHero ? "max-w-2xl text-base" : "text-sm"}`}>
+                        {story.excerpt}
+                      </p>
+                      <div className="mt-5">
+                        {story.live ? (
+                          <Link href={`/blog/${story.slug}`} className="text-sm font-semibold text-blue-600 hover:underline">
+                            Read article
+                          </Link>
+                        ) : (
+                          <span className="text-sm font-semibold text-blue-600">Demo story</span>
+                        )}
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           </div>
 
-          <aside className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_14px_36px_rgba(15,23,42,0.08)]">
-            <h3 className="mb-5 text-3xl font-extrabold tracking-tight">Top Stories</h3>
+          <aside className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-[0_18px_45px_rgba(15,23,42,0.08)] sm:p-6">
+            <div className="mb-5 flex items-center justify-between">
+              <h3 className="text-3xl font-black tracking-tight">Top Stories</h3>
+              <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Now</span>
+            </div>
             <div className="space-y-4">
               {topStories.map((story, index) => (
-                <div key={story.id} className="border-b border-slate-100 pb-4 last:border-0 last:pb-0">
-                  <div className="flex items-start gap-3">
-                    <span className="mt-1 flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-xs font-bold">
+                <article key={story.id} className="border-b border-slate-100 pb-4 last:border-0 last:pb-0">
+                  <div className="grid grid-cols-[32px_1fr] gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-sm font-bold text-slate-700">
                       {index + 1}
-                    </span>
+                    </div>
                     <div>
-                      {renderStoryLink(story, "text-xl font-semibold leading-snug hover:text-blue-600")}
+                      {renderStoryLink(story, "block text-lg font-bold leading-snug transition hover:text-blue-600")}
                       <p className="mt-2 text-xs font-medium uppercase tracking-[0.12em] text-slate-500">
                         {story.category} • {story.date}
                       </p>
                     </div>
                   </div>
-                </div>
+                </article>
               ))}
             </div>
           </aside>
         </section>
 
-        <section className="mt-10 rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_14px_36px_rgba(15,23,42,0.08)]">
-          <div className="mb-6 flex items-center justify-between">
-            <div>
-              <h3 className="text-4xl font-black tracking-tight">Trending In Tech</h3>
-              <p className="mt-2 text-sm text-slate-500">Top discussion topics across engineering teams this week</p>
+        <section className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.7fr)_minmax(320px,0.9fr)]">
+          <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-[0_18px_45px_rgba(15,23,42,0.08)] sm:p-6">
+            <div className="mb-5 flex items-center justify-between">
+              <div>
+                <h3 className="text-3xl font-black tracking-tight">Latest News</h3>
+                <p className="mt-2 text-sm text-slate-500">Fresh posts and editor notes from the desk</p>
+              </div>
+              <Link href="/blog" className="rounded-full border border-slate-300 px-3 py-1.5 text-sm font-semibold hover:bg-slate-50">
+                See all
+              </Link>
             </div>
-            <Link href="/blog" className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold hover:bg-slate-50">
-              View all
-            </Link>
-          </div>
 
-          <div className="grid gap-4 md:grid-cols-3">
-            {trendingStories.map((story, index) => (
-              <article key={story.id} className="rounded-xl border border-slate-200 p-4 transition hover:-translate-y-0.5 hover:shadow-[0_10px_24px_rgba(15,23,42,0.1)]">
-                <div
-                  className={`mb-3 h-36 rounded-lg ${
-                    index === 0
-                      ? "bg-[linear-gradient(120deg,#1d4ed8_0%,#38bdf8_100%)]"
-                      : index === 1
-                        ? "bg-[linear-gradient(120deg,#7c3aed_0%,#c4b5fd_100%)]"
-                        : "bg-[linear-gradient(120deg,#0f766e_0%,#34d399_100%)]"
-                  }`}
-                />
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">{story.category}</p>
-                <div className="mt-2 text-xl font-bold leading-snug">
-                  {renderStoryLink(story, "hover:text-blue-600")}
-                </div>
-                <p className="mt-3 text-sm text-slate-600">{story.excerpt}</p>
-                <div className="mt-4 text-xs font-medium text-slate-500">{story.readTime} • {story.date}</div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="mt-10 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_14px_36px_rgba(15,23,42,0.08)]">
-            <h3 className="mb-5 text-4xl font-black tracking-tight">Latest News</h3>
             <div className="space-y-4">
-              {latestStories.map((story, index) => (
-                <article key={story.id} className="grid gap-4 border-b border-slate-100 pb-4 last:border-0 last:pb-0 sm:grid-cols-[130px_1fr]">
+              {(searchQuery ? filteredLatest : latestStories).map((story, index) => (
+                <article key={story.id} className="grid gap-4 border-b border-slate-100 pb-4 last:border-0 last:pb-0 sm:grid-cols-[140px_1fr]">
                   <div
-                    className={`h-24 rounded-lg ${
+                    className={`h-24 rounded-2xl ${
                       index % 3 === 0
                         ? "bg-[linear-gradient(120deg,#0369a1_0%,#22d3ee_100%)]"
                         : index % 3 === 1
@@ -267,7 +354,7 @@ export default function HomePage() {
                     }`}
                   />
                   <div>
-                    <div className="text-2xl font-bold leading-snug">{renderStoryLink(story, "hover:text-blue-600")}</div>
+                    {renderStoryLink(story, "text-2xl font-black leading-tight transition hover:text-blue-600")}
                     <p className="mt-2 text-sm text-slate-600">{story.excerpt}</p>
                     <p className="mt-2 text-xs font-medium uppercase tracking-[0.1em] text-slate-500">
                       {story.category} • {story.date}
@@ -279,60 +366,69 @@ export default function HomePage() {
           </div>
 
           <div className="space-y-6">
-            <div className="rounded-2xl border border-slate-200 bg-[#101826] p-6 text-white shadow-[0_14px_36px_rgba(15,23,42,0.2)]">
-              <h4 className="text-3xl font-black leading-tight">Get sharp weekly tech briefings</h4>
-              <p className="mt-2 text-sm text-slate-300">Join product builders and engineers reading our weekly trend memo.</p>
-              <div className="mt-4 flex gap-2">
+            <section className="rounded-[28px] border border-slate-200 bg-[#101826] p-6 text-white shadow-[0_18px_45px_rgba(15,23,42,0.14)]">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">Subscribe</p>
+              <h4 className="mt-3 text-3xl font-black leading-tight">Get the latest tech stories first</h4>
+              <p className="mt-3 text-sm leading-6 text-slate-300">
+                Join readers who want concise, high-signal updates on engineering, AI, security, and product strategy.
+              </p>
+              <div className="mt-5 flex gap-2">
                 <input
                   type="email"
                   placeholder="Enter your email"
-                  className="w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-white placeholder:text-slate-400 focus:outline-none"
+                  className="w-full rounded-xl border border-slate-600 bg-slate-800 px-4 py-3 text-sm text-white placeholder:text-slate-400 focus:outline-none"
                 />
-                <button className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-emerald-400">
-                  Join
+                <button className="rounded-xl bg-emerald-500 px-4 py-3 text-sm font-bold text-slate-900 transition hover:bg-emerald-400">
+                  Subscribe
                 </button>
               </div>
-            </div>
+            </section>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_14px_36px_rgba(15,23,42,0.08)]">
-              <h4 className="mb-4 text-2xl font-black">Editor Picks</h4>
+            <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-[0_18px_45px_rgba(15,23,42,0.08)]">
+              <div className="mb-4 flex items-center justify-between">
+                <h4 className="text-2xl font-black">Editor Picks</h4>
+                <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+                  Selected
+                </span>
+              </div>
               <div className="space-y-3">
                 {stories.slice(0, 3).map((story) => (
-                  <article key={story.id} className="rounded-lg border border-slate-200 p-3">
-                    <div className="text-sm font-semibold">{renderStoryLink(story, "hover:text-blue-600")}</div>
-                    <p className="mt-1 text-xs uppercase tracking-[0.1em] text-slate-500">{story.category}</p>
+                  <article key={story.id} className="rounded-2xl border border-slate-200 p-4 transition hover:bg-slate-50">
+                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{story.category}</p>
+                    <div className="mt-2 text-lg font-bold leading-snug">{renderStoryLink(story, "transition hover:text-blue-600")}</div>
+                    <p className="mt-2 text-sm text-slate-600">{story.date} • {story.readTime}</p>
                   </article>
                 ))}
               </div>
-            </div>
+            </section>
           </div>
         </section>
 
         {!hasLivePosts && !postsLoading && (
-          <div className="mt-8 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            You are currently seeing curated demo content. Publish posts from admin to automatically replace all demo sections with real articles.
+          <div className="mt-8 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            Demo content is visible right now. Publish posts from the admin dashboard to replace it with real stories.
           </div>
         )}
 
-        <footer className="mt-14 rounded-2xl bg-[#111827] px-6 py-8 text-slate-200">
+        <footer className="mt-14 rounded-[28px] bg-[#111827] px-6 py-8 text-slate-200 shadow-[0_18px_45px_rgba(15,23,42,0.18)]">
           <div className="grid gap-8 md:grid-cols-4">
             <div>
               <p className="text-2xl font-black">InfoNet</p>
-              <p className="mt-2 text-sm text-slate-400">Your one-stop editorial on software, AI, security, and digital product strategy.</p>
-              <p className="mt-4 text-sm text-slate-400">hello@infonet.dev</p>
+              <p className="mt-3 text-sm leading-6 text-slate-400">
+                A high-signal editorial blog for engineers, builders, and technical leaders.
+              </p>
             </div>
             <div>
-              <p className="text-sm font-bold uppercase tracking-[0.12em] text-slate-400">Sections</p>
-              <div className="mt-3 space-y-2 text-sm">
-                <p>Tech</p>
-                <p>AI</p>
-                <p>Security</p>
-                <p>Cloud</p>
+              <p className="text-sm font-bold uppercase tracking-[0.12em] text-slate-400">Explore</p>
+              <div className="mt-3 space-y-2 text-sm text-slate-300">
+                {navLinks.map((link) => (
+                  <p key={link}>{link}</p>
+                ))}
               </div>
             </div>
             <div>
               <p className="text-sm font-bold uppercase tracking-[0.12em] text-slate-400">Company</p>
-              <div className="mt-3 space-y-2 text-sm">
+              <div className="mt-3 space-y-2 text-sm text-slate-300">
                 <p>About</p>
                 <p>Contact</p>
                 <p>Privacy</p>
@@ -345,9 +441,9 @@ export default function HomePage() {
                 <input
                   type="email"
                   placeholder="Email"
-                  className="w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm placeholder:text-slate-500"
+                  className="w-full rounded-xl border border-slate-600 bg-slate-800 px-3 py-3 text-sm placeholder:text-slate-500"
                 />
-                <button className="rounded-lg bg-emerald-500 px-3 py-2 text-sm font-bold text-slate-900">Go</button>
+                <button className="rounded-xl bg-emerald-500 px-3 py-3 text-sm font-bold text-slate-900">Go</button>
               </div>
             </div>
           </div>
