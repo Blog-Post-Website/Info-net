@@ -303,7 +303,7 @@ export default function HomePage() {
                       ) : (
                         <span>Explore Now</span>
                       )}
-                      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-slate-900">
+                      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-white">
                         <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current stroke-[2]" aria-hidden="true">
                           <circle cx="12" cy="12" r="9" />
                           <path d="M14.6 9.4 13.3 13.3 9.4 14.6 10.7 10.7z" strokeLinejoin="round" />
@@ -321,19 +321,25 @@ export default function HomePage() {
               <h3 className="text-3xl font-black tracking-tight">Top Stories</h3>
               <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Now</span>
             </div>
-            <div className="space-y-4">
+            <div className="divide-y divide-slate-100">
               {topStories.map((story, index) => (
-                <article key={story.id} className="border-b border-slate-100 pb-4 last:border-0 last:pb-0">
-                  <div className="grid grid-cols-[32px_1fr] gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-sm font-bold text-slate-700">
-                      {index + 1}
-                    </div>
+                <article key={story.id} className="py-4 first:pt-0 last:pb-0">
+                  <div className="grid grid-cols-[1fr_72px] items-start gap-4">
                     <div>
-                      {renderStoryLink(story, "block text-lg font-bold leading-snug transition hover:text-blue-600")}
-                      <p className="mt-2 text-xs font-medium uppercase tracking-[0.12em] text-slate-500">
-                        {story.category} • {story.date}
+                      {renderStoryLink(story, "line-clamp-2 text-lg font-bold leading-snug transition hover:text-blue-600")}
+                      <p className="mt-2 text-xs font-medium text-slate-500">
+                        InfoNet • {story.date}
                       </p>
                     </div>
+                    <div
+                      className={`h-16 w-16 rounded-xl ${
+                        index % 3 === 0
+                          ? "bg-[linear-gradient(120deg,#0369a1_0%,#22d3ee_100%)]"
+                          : index % 3 === 1
+                            ? "bg-[linear-gradient(120deg,#be123c_0%,#fb7185_100%)]"
+                            : "bg-[linear-gradient(120deg,#334155_0%,#94a3b8_100%)]"
+                      }`}
+                    />
                   </div>
                 </article>
               ))}
