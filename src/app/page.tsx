@@ -204,7 +204,7 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-[#f3f4f6] text-slate-900">
       <header className="border-b border-slate-200 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-[92rem] items-center gap-6 px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <FormLink href="/" className="text-2xl font-black tracking-tight text-slate-900">
               InfoNet
@@ -248,7 +248,7 @@ export default function HomePage() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-7xl px-4 pb-16 pt-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[92rem] px-4 pb-16 pt-6 sm:px-6 lg:px-8">
         <div className="mb-5 flex items-center justify-between border-b border-slate-200 pb-3 text-sm text-slate-600 lg:hidden">
           <div className="flex flex-wrap gap-3">
             {navLinks.map((link) => (
@@ -265,7 +265,7 @@ export default function HomePage() {
           </FormLink>
         </div>
 
-        <section className="grid gap-6 xl:grid-cols-[minmax(0,1.7fr)_minmax(320px,0.9fr)]">
+        <section className="grid gap-6 xl:grid-cols-[minmax(0,2.1fr)_minmax(380px,1fr)]">
           <div className="rounded-[28px] border border-slate-200 bg-white p-4 shadow-[0_18px_45px_rgba(15,23,42,0.08)] sm:p-5">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-3xl font-black tracking-tight sm:text-4xl">Featured Article</h2>
@@ -344,7 +344,7 @@ export default function HomePage() {
           </aside>
         </section>
 
-        <section className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.7fr)_minmax(320px,0.9fr)]">
+        <section className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,2.1fr)_minmax(380px,1fr)]">
           <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-[0_18px_45px_rgba(15,23,42,0.08)] sm:p-6">
             <div className="mb-5 flex items-center justify-between">
               <div>
