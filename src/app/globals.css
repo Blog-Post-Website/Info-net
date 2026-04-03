@@ -23,6 +23,8 @@ a:visited {
   text-decoration: none !important;
   text-decoration-line: none !important;
   text-decoration-color: transparent !important;
+  border-bottom: 0 !important;
+  background-image: none !important;
 }
 
 /* Override Tailwind prose underlines */
