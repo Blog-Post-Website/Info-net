@@ -21,6 +21,8 @@ a:focus,
 a:active,
 a:visited {
   text-decoration: none !important;
+  text-decoration-line: none !important;
+  text-decoration-color: transparent !important;
 }
 
 /* Override Tailwind prose underlines */
@@ -34,4 +36,13 @@ a:visited {
 /* Force all links everywhere to have no underline */
 [class*="prose"] a {
   text-decoration: none !important;
+  text-decoration-line: none !important;
+}
+
+header a,
+header a:hover,
+header a:focus,
+header a:active {
+  text-decoration: none !important;
+  text-decoration-line: none !important;
 }
