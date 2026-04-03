@@ -71,6 +71,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <FormLink href="/admin/tags" className="block w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-700 hover:bg-slate-100">
             Tags
           </FormLink>
+          <FormLink href="/admin/account" className="block w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-700 hover:bg-slate-100">
+            Change Password
+          </FormLink>
         </nav>
 
         <div className="border-t border-slate-200 p-4">
