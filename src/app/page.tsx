@@ -206,7 +206,7 @@ export default function HomePage() {
       <header className="border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-2xl font-black tracking-tight text-slate-900 no-underline">
+            <Link href="/" className="text-2xl font-black tracking-tight text-slate-900 no-underline hover:no-underline">
               InfoNet
             </Link>
           </div>
@@ -220,7 +220,10 @@ export default function HomePage() {
           </nav>
 
           <div className="ml-auto flex items-center gap-3">
-            <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-1.5 shadow-sm">
+            <form
+              onSubmit={handleSearchSubmit}
+              className="flex w-full min-w-0 flex-1 max-w-[640px] items-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-1.5 shadow-sm"
+            >
               <button type="submit" className="text-slate-500 transition hover:text-slate-900" aria-label="Search blog">
                 <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current stroke-[2]">
                   <circle cx="11" cy="11" r="7" />
@@ -232,14 +235,14 @@ export default function HomePage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search"
-                className="w-28 bg-transparent text-sm outline-none placeholder:text-slate-400 sm:w-36"
+                className="w-full min-w-0 bg-transparent text-sm outline-none placeholder:text-slate-400"
               />
             </form>
             <Link
               href={`mailto:${contactEmail}?subject=InfoNet%20Subscribe%20Request`}
               className="hidden rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 sm:inline-flex"
             >
-              Subscribe
+              Subscribe Now
             </Link>
           </div>
         </div>
@@ -258,7 +261,7 @@ export default function HomePage() {
             href={`mailto:${contactEmail}?subject=InfoNet%20Subscribe%20Request`}
             className="rounded-full bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white"
           >
-            Subscribe
+            Subscribe Now
           </Link>
         </div>
 
