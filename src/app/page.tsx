@@ -213,16 +213,16 @@ export default function HomePage() {
 
           <nav className="hidden flex-1 items-center justify-center gap-7 text-sm font-medium text-slate-700 lg:flex">
             {navLinks.map((link) => (
-              <Link key={link.label} href={link.href} className="transition hover:text-slate-900 no-underline">
+              <Link key={link.label} href={link.href} className="no-underline transition hover:text-slate-900 hover:no-underline">
                 {link.label}
               </Link>
             ))}
           </nav>
 
-          <div className="ml-auto flex items-center gap-3">
+          <div className="ml-auto flex flex-1 items-center justify-end gap-3 lg:max-w-[760px]">
             <form
               onSubmit={handleSearchSubmit}
-              className="flex w-full min-w-0 flex-1 max-w-[640px] items-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-1.5 shadow-sm"
+              className="flex w-full min-w-0 flex-1 max-w-[760px] items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-1.5 shadow-sm"
             >
               <button type="submit" className="text-slate-500 transition hover:text-slate-900" aria-label="Search blog">
                 <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current stroke-[2]">
@@ -240,7 +240,7 @@ export default function HomePage() {
             </form>
             <Link
               href={`mailto:${contactEmail}?subject=InfoNet%20Subscribe%20Request`}
-              className="hidden rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 sm:inline-flex"
+              className="hidden rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white no-underline transition hover:bg-slate-700 hover:no-underline sm:inline-flex"
             >
               Subscribe Now
             </Link>
@@ -252,14 +252,14 @@ export default function HomePage() {
         <div className="mb-5 flex items-center justify-between border-b border-slate-200 pb-3 text-sm text-slate-600 lg:hidden">
           <div className="flex flex-wrap gap-3">
             {navLinks.map((link) => (
-              <Link key={link.label} href={link.href} className="font-medium no-underline hover:text-slate-900">
+              <Link key={link.label} href={link.href} className="font-medium no-underline hover:text-slate-900 hover:no-underline">
                 {link.label}
               </Link>
             ))}
           </div>
           <Link
             href={`mailto:${contactEmail}?subject=InfoNet%20Subscribe%20Request`}
-            className="rounded-full bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white"
+            className="rounded-full bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white no-underline hover:no-underline"
           >
             Subscribe Now
           </Link>
