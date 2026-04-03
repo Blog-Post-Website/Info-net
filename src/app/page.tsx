@@ -120,12 +120,6 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    if (!loading && user && isAdmin) {
-      router.push("/admin/dashboard");
-    }
-  }, [user, isAdmin, loading, router]);
-
-  useEffect(() => {
     const fetchPosts = async () => {
       try {
         const res = await fetch("/api/public/posts?limit=12");
