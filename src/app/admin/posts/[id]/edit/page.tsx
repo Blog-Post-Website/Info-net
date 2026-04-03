@@ -111,81 +111,91 @@ export default function EditPostPage() {
   };
 
   if (authLoading || isLoading) {
-    return <div className="text-center py-8">Loading...</div>;
+    return (
+      <div className="p-8">
+        <div className="text-center py-8">Loading...</div>
+      </div>
+    );
   }
 
   if (!post) {
-    return <div className="text-center py-8">Post not found</div>;
+    return (
+      <div className="p-8">
+        <div className="text-center py-8">Post not found</div>
+      </div>
+    );
   }
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-gray-300 pb-4 mb-4 dark:border-gray-600">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Edit Post</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            {post.status === "published"
-              ? `Published on ${new Date(post.published_at!).toLocaleDateString()}`
-              : "Draft"}
-          </p>
-        </div>
-        <div className="flex gap-2">
-          {post.status === "draft" && (
+    <div className="p-8">
+      <div className="flex flex-col h-full">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-gray-300 pb-4 mb-4 dark:border-gray-600">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Edit Post</h1>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {post.status === "published"
+                ? `Published on ${new Date(post.published_at!).toLocaleDateString()}`
+                : "Draft"}
+            </p>
+          </div>
+          <div className="flex gap-2">
+            {post.status === "draft" && (
+              <button
+                onClick={handlePublish}
+                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+              >
+                Publish
+              </button>
+            )}
             <button
-              onClick={handlePublish}
-              className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+              onClick={() => setShowVersions(!showVersions)}
+              className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
             >
-              Publish
+              Versions ({versions.length})
             </button>
-          )}
-          <button
-            onClick={() => setShowVersions(!showVersions)}
-            className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
-          >
-            Versions ({versions.length})
-          </button>
-          <button
-            onClick={() => router.push("/admin/posts")}
-            className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 transition-colors"
-          >
-            Back
-          </button>
+            <button
+              onClick={() => router.push("/admin/posts")}
+              className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 transition-colors"
+            >
+              Back
+            </button>
+          </div>
         </div>
+
+        {/* Versions Sidebar */}
+        {showVersions && (
+          <div className="mb-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg max-h-64 overflow-y-auto">
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Version History</h3>
+            {versions.length > 0 ? (
+              <ul className="space-y-2 text-sm">
+                {versions.map((version) => (
+                  <li
+                    key={version.id}
+                    className="p-2 bg-white dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600"
+                  >
+                    <div className="font-medium text-gray-900 dark:text-white">{version.title}</div>
+                    <div className="text-gray-600 dark:text-gray-400">
+                      {new Date(version.created_at).toLocaleString()}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-600 dark:text-gray-400">No versions yet</p>
+            )}
+          </div>
+        )}
+
+        {/* Editor */}
+        <MarkdownEditor
+          initialTitle={post.title}
+          initialContent={post.content}
+          onSave={handleSave}
+          onAutoSave={handleAutoSave}
+          autoSaveInterval={10000}
+        />
       </div>
-
-      {/* Versions Sidebar */}
-      {showVersions && (
-        <div className="mb-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg max-h-64 overflow-y-auto">
-          <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Version History</h3>
-          {versions.length > 0 ? (
-            <ul className="space-y-2 text-sm">
-              {versions.map((version) => (
-                <li
-                  key={version.id}
-                  className="p-2 bg-white dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600"
-                >
-                  <div className="font-medium text-gray-900 dark:text-white">{version.title}</div>
-                  <div className="text-gray-600 dark:text-gray-400">
-                    {new Date(version.created_at).toLocaleString()}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-600 dark:text-gray-400">No versions yet</p>
-          )}
-        </div>
-      )}
-
-      {/* Editor */}
-      <MarkdownEditor
-        initialTitle={post.title}
-        initialContent={post.content}
-        onSave={handleSave}
-        onAutoSave={handleAutoSave}
-        autoSaveInterval={10000}
-      />
     </div>
   );
 }
