@@ -14,3 +14,11 @@ body {
     linear-gradient(180deg, #fffef8 0%, #f6f8fb 100%);
   color: #102017;
 }
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: none;
+}

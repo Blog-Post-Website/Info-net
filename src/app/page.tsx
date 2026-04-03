@@ -219,7 +219,7 @@ export default function HomePage() {
             ))}
           </nav>
 
-          <div className="ml-auto flex flex-1 items-center justify-end gap-3 lg:max-w-[760px]">
+          <div className="ml-auto flex flex-1 items-center justify-end gap-6 lg:max-w-[760px]">
             <form
               onSubmit={handleSearchSubmit}
               className="flex w-full min-w-0 flex-1 max-w-[760px] items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-1.5 shadow-sm"
@@ -305,7 +305,7 @@ export default function HomePage() {
                       </p>
                       <div className="mt-5">
                         {story.live ? (
-                          <Link href={`/blog/${story.slug}`} className="text-sm font-semibold text-blue-600 hover:underline">
+                          <Link href={`/blog/${story.slug}`} className="text-sm font-semibold text-blue-600 hover:text-blue-700">
                             Read article
                           </Link>
                         ) : (
