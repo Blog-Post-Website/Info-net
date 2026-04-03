@@ -26,7 +26,12 @@ type Story = {
   rank: number;
 };
 
-const navLinks = ["World", "AI", "Business", "Tech", "Science", "Security", "Culture"];
+const navLinks = [
+  { label: "Home", href: "/" },
+  { label: "About", href: "/about" },
+  { label: "Policy", href: "/policy" },
+  { label: "Contact", href: "/contact" },
+];
 
 const demoStories: Omit<Story, "slug" | "live" | "rank">[] = [
   {
@@ -143,7 +148,7 @@ export default function HomePage() {
         id: post.id,
         title: post.title,
         excerpt: post.excerpt || post.content.substring(0, 170),
-        category: navLinks[index % navLinks.length] || "Tech",
+        category: navLinks[index % navLinks.length]?.label || "Tech",
         readTime: `${5 + (index % 6)} min read`,
         date: new Date(post.published_at).toLocaleDateString("en-US", {
           month: "short",
@@ -199,18 +204,15 @@ export default function HomePage() {
       <header className="border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-2xl font-black tracking-tight text-slate-900">
+            <Link href="/" className="text-2xl font-black tracking-tight text-slate-900 no-underline">
               InfoNet
             </Link>
-            <span className="hidden rounded-lg border border-slate-300 bg-slate-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 md:inline-flex">
-              Daily Tech Desk
-            </span>
           </div>
 
           <nav className="hidden flex-1 items-center justify-center gap-7 text-sm font-medium text-slate-700 lg:flex">
             {navLinks.map((link) => (
-              <Link key={link} href={`/blog?category=${encodeURIComponent(link)}`} className="transition hover:text-slate-900">
-                {link}
+              <Link key={link.label} href={link.href} className="transition hover:text-slate-900 no-underline">
+                {link.label}
               </Link>
             ))}
           </nav>
@@ -241,9 +243,9 @@ export default function HomePage() {
       <div className="mx-auto max-w-7xl px-4 pb-16 pt-6 sm:px-6 lg:px-8">
         <div className="mb-5 flex items-center justify-between border-b border-slate-200 pb-3 text-sm text-slate-600 lg:hidden">
           <div className="flex flex-wrap gap-3">
-            {navLinks.slice(0, 4).map((link) => (
-              <Link key={link} href={`/blog?category=${encodeURIComponent(link)}`} className="font-medium hover:text-slate-900">
-                {link}
+            {navLinks.map((link) => (
+              <Link key={link.label} href={link.href} className="font-medium no-underline hover:text-slate-900">
+                {link.label}
               </Link>
             ))}
           </div>
@@ -422,7 +424,7 @@ export default function HomePage() {
               <p className="text-sm font-bold uppercase tracking-[0.12em] text-slate-400">Explore</p>
               <div className="mt-3 space-y-2 text-sm text-slate-300">
                 {navLinks.map((link) => (
-                  <p key={link}>{link}</p>
+                  <p key={link.label}>{link.label}</p>
                 ))}
               </div>
             </div>
