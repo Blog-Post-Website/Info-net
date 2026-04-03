@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { getPublishedPosts } from "@/lib/supabase/queries";
+import FormLink from "@/components/FormLink";
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -84,11 +84,11 @@ export default async function BlogPage() {
           <div className="space-y-8">
             {posts.map((post) => (
               <article key={post.id} className="border-b border-gray-200 pb-8 dark:border-gray-700">
-                <Link href={`/blog/${post.slug}`}>
+                <FormLink href={`/blog/${post.slug}`} className="contents">
                   <h2 className="mb-2 text-2xl font-bold text-gray-900 transition-colors hover:text-blue-500 dark:text-white">
                     {post.title}
                   </h2>
-                </Link>
+                </FormLink>
                 <div className="mb-4 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                   <time dateTime={post.published_at || post.created_at}>
                     {new Date(post.published_at || post.created_at).toLocaleDateString("en-US", {
@@ -101,12 +101,9 @@ export default async function BlogPage() {
                 <p className="mb-4 line-clamp-3 text-gray-700 dark:text-gray-300">
                   {post.excerpt || post.content.substring(0, 160)}...
                 </p>
-                <Link
-                  href={`/blog/${post.slug}`}
-                  className="font-medium text-blue-500 transition-colors hover:text-blue-600"
-                >
+                <FormLink href={`/blog/${post.slug}`} className="font-medium text-blue-500 transition-colors hover:text-blue-600">
                   Read more {"->"}
-                </Link>
+                </FormLink>
               </article>
             ))}
           </div>

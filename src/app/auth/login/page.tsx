@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
+import FormLink from "@/components/FormLink";
 
 export default function LoginPage() {
   const [accessEmail, setAccessEmail] = useState("");
@@ -89,9 +89,9 @@ export default function LoginPage() {
             </form>
 
             <p className="mt-4 text-center text-sm text-slate-600">
-              <Link href="/" className="font-medium text-emerald-600 hover:text-emerald-700">
+              <FormLink href="/" className="font-medium text-emerald-600 transition hover:text-emerald-700">
                 Back to homepage
-              </Link>
+              </FormLink>
             </p>
           </>
         ) : (

@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
+import FormLink from "@/components/FormLink";
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
@@ -106,9 +106,9 @@ export default function SignupPage() {
 
         <p className="mt-4 text-center text-sm text-slate-600">
           Already have an account?{" "}
-          <Link href="/auth/login" className="font-medium text-emerald-600 hover:text-emerald-700">
+          <FormLink href="/auth/login" className="font-medium text-emerald-600 transition hover:text-emerald-700">
             Sign in
-          </Link>
+          </FormLink>
         </p>
       </div>
     </main>

@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMemo } from "react";
 import { authFetch } from "@/lib/auth-fetch";
+import FormLink from "@/components/FormLink";
 
 interface Post {
   id: string;
@@ -76,12 +76,9 @@ export default function AdminPostsPage() {
             {stats.total} total • {stats.published} published • {stats.drafts} drafts
           </p>
         </div>
-        <Link
-          href="/admin/posts/new"
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-        >
+        <FormLink href="/admin/posts/new" className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
           New Post
-        </Link>
+        </FormLink>
       </div>
 
       {/* Search and Filter */}
@@ -162,12 +159,12 @@ export default function AdminPostsPage() {
                     {new Date(post.updated_at).toLocaleDateString()}
                   </td>
                   <td className="px-4 py-3 text-sm space-x-2 flex">
-                    <Link
+                    <FormLink
                       href={`/admin/posts/${post.id}/edit`}
                       className="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800 transition-colors"
                     >
                       Edit
-                    </Link>
+                    </FormLink>
                     {post.status === "draft" && (
                       <button
                         onClick={async () => {

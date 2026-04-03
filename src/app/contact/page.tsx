@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import FormLink from "@/components/FormLink";
 
 const contactEmail = "online.upskill.dev@gmail.com";
 
@@ -54,12 +54,12 @@ export default function ContactPage() {
           </div>
 
           <div className="mt-10 flex flex-wrap gap-3">
-            <Link href="/" className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">
+            <FormLink href="/" className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">
               Home
-            </Link>
-            <Link href="/blog" className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">
+            </FormLink>
+            <FormLink href="/blog" className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">
               Browse blog
-            </Link>
+            </FormLink>
           </div>
         </div>
       </section>

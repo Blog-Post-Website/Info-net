@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
+import FormLink from "@/components/FormLink";
 
 interface Post {
   id: string;
@@ -186,9 +186,9 @@ export default function HomePage() {
     }
 
     return (
-      <Link href={`/blog/${story.slug}`} className={className}>
+      <FormLink href={`/blog/${story.slug}`} className={className}>
         {story.title}
-      </Link>
+      </FormLink>
     );
   };
 
@@ -206,21 +206,16 @@ export default function HomePage() {
       <header className="border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-2xl font-black tracking-tight text-slate-900 !no-underline hover:!no-underline" style={{ textDecoration: "none" }}>
+            <FormLink href="/" className="text-2xl font-black tracking-tight text-slate-900">
               InfoNet
-            </Link>
+            </FormLink>
           </div>
 
           <nav className="hidden flex-1 items-center justify-center gap-7 text-sm font-medium text-slate-700 lg:flex">
             {navLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="transition hover:text-blue-600 !no-underline hover:!no-underline"
-                style={{ textDecoration: "none" }}
-              >
+              <FormLink key={link.label} href={link.href} className="transition hover:text-blue-600">
                 {link.label}
-              </Link>
+              </FormLink>
             ))}
           </nav>
 
@@ -243,13 +238,12 @@ export default function HomePage() {
                 className="w-full min-w-0 bg-transparent text-sm outline-none placeholder:text-slate-400"
               />
             </form>
-            <Link
+            <FormLink
               href={`mailto:${contactEmail}?subject=InfoNet%20Subscribe%20Request`}
-              className="hidden rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 sm:inline-flex !no-underline hover:!no-underline"
-              style={{ textDecoration: "none" }}
+              className="hidden rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 sm:inline-flex"
             >
               Subscribe Now
-            </Link>
+            </FormLink>
           </div>
         </div>
       </header>
@@ -258,23 +252,17 @@ export default function HomePage() {
         <div className="mb-5 flex items-center justify-between border-b border-slate-200 pb-3 text-sm text-slate-600 lg:hidden">
           <div className="flex flex-wrap gap-3">
             {navLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="font-medium transition hover:text-blue-600 !no-underline hover:!no-underline"
-                style={{ textDecoration: "none" }}
-              >
+              <FormLink key={link.label} href={link.href} className="font-medium transition hover:text-blue-600">
                 {link.label}
-              </Link>
+              </FormLink>
             ))}
           </div>
-          <Link
+          <FormLink
             href={`mailto:${contactEmail}?subject=InfoNet%20Subscribe%20Request`}
-            className="rounded-full bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700 !no-underline hover:!no-underline"
-            style={{ textDecoration: "none" }}
+            className="rounded-full bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700"
           >
             Subscribe Now
-          </Link>
+          </FormLink>
         </div>
 
         <section className="grid gap-6 xl:grid-cols-[minmax(0,1.7fr)_minmax(320px,0.9fr)]">
@@ -317,9 +305,9 @@ export default function HomePage() {
                       </p>
                       <div className="mt-5">
                         {story.live ? (
-                          <Link href={`/blog/${story.slug}`} className="text-sm font-semibold text-blue-600 hover:text-blue-700">
+                          <FormLink href={`/blog/${story.slug}`} className="text-sm font-semibold text-blue-600 transition hover:text-blue-700">
                             Read article
-                          </Link>
+                          </FormLink>
                         ) : (
                           <span className="text-sm font-semibold text-blue-600">Demo story</span>
                         )}
@@ -363,9 +351,9 @@ export default function HomePage() {
                 <h3 className="text-3xl font-black tracking-tight">Latest News</h3>
                 <p className="mt-2 text-sm text-slate-500">Fresh posts and editor notes from the desk</p>
               </div>
-              <Link href="/blog" className="rounded-full border border-slate-300 px-3 py-1.5 text-sm font-semibold transition hover:bg-slate-50">
+              <FormLink href="/blog" className="rounded-full border border-slate-300 px-3 py-1.5 text-sm font-semibold transition hover:bg-slate-50">
                 See all
-              </Link>
+              </FormLink>
             </div>
 
             <div className="space-y-4">
@@ -400,12 +388,12 @@ export default function HomePage() {
                 Join readers who want concise, high-signal updates on engineering, AI, security, and product strategy.
               </p>
               <div className="mt-5 flex flex-wrap items-center gap-3">
-                <Link
+                <FormLink
                   href={`mailto:${contactEmail}?subject=InfoNet%20Subscribe%20Request`}
                   className="rounded-xl bg-emerald-500 px-5 py-3 text-sm font-bold text-slate-900 transition hover:bg-emerald-400"
                 >
                   Subscribe via email
-                </Link>
+                </FormLink>
                 <p className="text-xs text-slate-400">Send a message to {contactEmail}</p>
               </div>
             </section>
@@ -464,12 +452,12 @@ export default function HomePage() {
             <div>
               <p className="text-sm font-bold uppercase tracking-[0.12em] text-slate-400">Stay Updated</p>
               <div className="mt-3 flex flex-col gap-2">
-                <Link
+                <FormLink
                   href={`mailto:${contactEmail}?subject=InfoNet%20Subscribe%20Request`}
                   className="rounded-xl bg-emerald-500 px-3 py-3 text-center text-sm font-bold text-slate-900 transition hover:bg-emerald-400"
                 >
                   Email to subscribe
-                </Link>
+                </FormLink>
                 <p className="text-xs text-slate-400">{contactEmail}</p>
               </div>
             </div>

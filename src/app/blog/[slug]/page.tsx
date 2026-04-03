@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import { getPublishedPostBySlug } from "@/lib/supabase/queries";
+import FormLink from "@/components/FormLink";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://infonet-flax.vercel.app";
 
@@ -43,6 +43,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
         title: post.title,
         description,
         images: [`/blog/${post.slug}/opengraph-image`],
+      },
+      robots: {
+        index: true,
+        follow: true,
       },
     };
   } catch {
@@ -183,9 +187,17 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                   />
                 ),
               pre: ({ ...props }) => <pre className="mb-4" {...props} />,
-              a: ({ ...props }) => (
-                <a className="text-blue-500" target="_blank" rel="noopener noreferrer" {...props} />
-              ),
+              a: ({ children, href }) => {
+                if (!href) {
+                  return <span className="text-blue-500">{children}</span>;
+                }
+
+                return (
+                  <FormLink href={href} className="text-blue-500 transition hover:text-blue-600">
+                    {children}
+                  </FormLink>
+                );
+              },
             }}
           >
             {post.content}
@@ -193,9 +205,9 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
         </article>
 
         <div className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-700">
-          <Link href="/blog" className="font-medium text-blue-500 transition-colors hover:text-blue-600">
+          <FormLink href="/blog" className="font-medium text-blue-500 transition-colors hover:text-blue-600">
             {"<-"} Back to blog
-          </Link>
+          </FormLink>
         </div>
       </div>
     </div>

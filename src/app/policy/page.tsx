@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import FormLink from "@/components/FormLink";
 
 export const metadata: Metadata = {
   title: "Policy",
@@ -34,12 +34,12 @@ export default function PolicyPage() {
           </div>
 
           <div className="mt-10 flex flex-wrap gap-3">
-            <Link href="/about" className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">
-              About
-            </Link>
-            <Link href="/contact" className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">
-              Contact
-            </Link>
+               <FormLink href="/about" className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">
+                 About
+               </FormLink>
+               <FormLink href="/contact" className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">
+                 Contact
+               </FormLink>
           </div>
         </div>
       </section>

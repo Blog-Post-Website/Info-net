@@ -1,9 +1,9 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import FormLink from "@/components/FormLink";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, isAdmin, loading, signOut } = useAuth();
@@ -59,30 +59,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
 
         <nav className="space-y-1 px-3 py-4">
-          <Link
-            href="/admin/dashboard"
-            className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
-          >
+          <FormLink href="/admin/dashboard" className="block w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-700 hover:bg-slate-100">
             Dashboard
-          </Link>
-          <Link
-            href="/admin/posts"
-            className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
-          >
+          </FormLink>
+          <FormLink href="/admin/posts" className="block w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-700 hover:bg-slate-100">
             Posts
-          </Link>
-          <Link
-            href="/admin/categories"
-            className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
-          >
+          </FormLink>
+          <FormLink href="/admin/categories" className="block w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-700 hover:bg-slate-100">
             Categories
-          </Link>
-          <Link
-            href="/admin/tags"
-            className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
-          >
+          </FormLink>
+          <FormLink href="/admin/tags" className="block w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-700 hover:bg-slate-100">
             Tags
-          </Link>
+          </FormLink>
         </nav>
 
         <div className="border-t border-slate-200 p-4">

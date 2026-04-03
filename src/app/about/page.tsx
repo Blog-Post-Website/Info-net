@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import FormLink from "@/components/FormLink";
 
 export const metadata: Metadata = {
   title: "About",
@@ -35,12 +35,12 @@ export default function AboutPage() {
           </div>
 
           <div className="mt-10 flex flex-wrap gap-3">
-            <Link href="/blog" className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">
-              Read the blog
-            </Link>
-            <Link href="/contact" className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">
-              Contact us
-            </Link>
+              <FormLink href="/blog" className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">
+                Read the blog
+              </FormLink>
+              <FormLink href="/contact" className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">
+                Contact us
+              </FormLink>
           </div>
         </div>
       </section>
