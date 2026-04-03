@@ -276,7 +276,7 @@ export default function HomePage() {
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {featuredStories.map((story, index) => (
-                <article key={story.id} className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                <article key={story.id} className="overflow-hidden rounded-xl border border-slate-200 bg-white">
                   <div className={`relative h-40 ${featuredTiles[index % featuredTiles.length]}`}>
                     <div className="absolute inset-0 bg-black/15" />
                     <div className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-700">
@@ -293,19 +293,20 @@ export default function HomePage() {
 
                     {renderStoryLink(story, "block text-lg font-bold leading-snug transition hover:text-blue-600")}
 
-                    <p className="mt-2 text-sm text-slate-600">{story.excerpt}</p>
+                    <p className="mt-2 line-clamp-3 text-sm text-slate-600">{story.excerpt}</p>
 
                     <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-slate-700">
                       {story.live ? (
                         <FormLink href={`/blog/${story.slug}`} className="transition hover:text-blue-700">
-                          Learn more
+                          Explore Now
                         </FormLink>
                       ) : (
-                        <span>Learn more</span>
+                        <span>Explore Now</span>
                       )}
                       <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 text-slate-900">
                         <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current stroke-[2]" aria-hidden="true">
-                          <path d="M9 18 15 12 9 6" strokeLinecap="round" strokeLinejoin="round" />
+                          <circle cx="12" cy="12" r="9" />
+                          <path d="M14.6 9.4 13.3 13.3 9.4 14.6 10.7 10.7z" strokeLinejoin="round" />
                         </svg>
                       </span>
                     </div>
