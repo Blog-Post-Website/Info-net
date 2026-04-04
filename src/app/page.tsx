@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import FormLink from "@/components/FormLink";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabase/client";
 
 interface Post {
   id: string;
@@ -26,6 +27,7 @@ type Story = {
   live: boolean;
   rank: number;
   imageUrl?: string | null;
+  likeCount: number;
 };
 
 const navLinks = [
@@ -35,7 +37,7 @@ const navLinks = [
   { label: "Contact", href: "/contact" },
 ];
 
-const demoStories: Omit<Story, "slug" | "live" | "rank">[] = [
+const demoStories: Omit<Story, "slug" | "live" | "rank" | "likeCount">[] = [
   {
     id: "demo-1",
     title: "Why Edge AI Is Rewriting Frontend Performance in 2026",
@@ -128,6 +130,7 @@ export default function HomePage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [postsLoading, setPostsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [likeCounts, setLikeCounts] = useState<Record<string, number>>({});
 
   const displayName = useMemo(() => {
     if (!user) return "";
@@ -166,6 +169,41 @@ export default function HomePage() {
     fetchPosts();
   }, []);
 
+  useEffect(() => {
+    if (posts.length === 0) {
+      setLikeCounts({});
+      return;
+    }
+
+    let cancelled = false;
+
+    const fetchLikeCounts = async () => {
+      try {
+        const ids = posts.map((post) => post.id);
+        const { data, error } = await supabase.from("post_likes").select("post_id").in("post_id", ids);
+        if (error) throw error;
+
+        const counts: Record<string, number> = {};
+        for (const row of data ?? []) {
+          const postId = (row as { post_id?: string }).post_id;
+          if (!postId) continue;
+          counts[postId] = (counts[postId] ?? 0) + 1;
+        }
+
+        if (!cancelled) setLikeCounts(counts);
+      } catch (err) {
+        console.error("Error fetching likes:", err);
+        if (!cancelled) setLikeCounts({});
+      }
+    };
+
+    void fetchLikeCounts();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [posts]);
+
   const hasLivePosts = posts.length > 0;
 
   const stories: Story[] = hasLivePosts
@@ -184,12 +222,14 @@ export default function HomePage() {
         live: true,
         rank: index + 1,
         imageUrl: post.featured_image_url ?? null,
+        likeCount: likeCounts[post.id] ?? 0,
       }))
     : demoStories.map((story, index) => ({
         ...story,
         slug: "",
         live: false,
         rank: index + 1,
+        likeCount: 0,
       }));
 
   const featuredStories = useMemo(() => stories.slice(0, 6), [stories]);
@@ -358,10 +398,21 @@ export default function HomePage() {
                   </div>
 
                   <div className="p-4">
-                    <div className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.1em] text-slate-500">
-                      <span>{story.date}</span>
-                      <span>•</span>
-                      <span>{story.readTime}</span>
+                    <div className="mb-2 flex items-center justify-between gap-3 text-xs font-medium uppercase tracking-[0.1em] text-slate-500">
+                      <div className="flex items-center gap-2">
+                        <span>{story.date}</span>
+                        <span>•</span>
+                        <span>{story.readTime}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current stroke-[2]" aria-hidden="true">
+                          <path
+                            d="M12 20.5s-7-4.5-9.5-9C.6 8 .9 5.4 3 3.5 4.9 1.7 8 2 10 4c.7.7 1.3 1.6 2 2.8.7-1.2 1.3-2.1 2-2.8 2-2 5.1-2.3 7-.5 2.1 1.9 2.4 4.5.5 8-2.5 4.5-9.5 9-9.5 9z"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        <span>{story.likeCount}</span>
+                      </div>
                     </div>
 
                     {renderStoryLink(story, "block cursor-pointer text-lg font-bold leading-snug transition hover:text-blue-600")}
