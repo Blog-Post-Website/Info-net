@@ -63,11 +63,11 @@ export default function PublicHeader() {
           ))}
         </nav>
 
-        <div className="ml-auto flex flex-1 items-center justify-end gap-4 lg:gap-8 lg:max-w-[1100px]">
+        <div className="ml-auto flex flex-1 items-center justify-end gap-4 lg:flex-[2] lg:gap-8">
           <form
             action="/blog"
             method="get"
-            className="hidden w-full min-w-0 flex-1 max-w-[1100px] items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-1.5 shadow-sm dark:border-gray-800 dark:bg-gray-950 sm:flex"
+            className="hidden w-full min-w-0 flex-1 items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-1.5 shadow-sm dark:border-gray-800 dark:bg-gray-950 sm:flex"
           >
             <button type="submit" className="text-slate-500 transition hover:text-slate-900 dark:hover:text-white" aria-label="Search blog">
               <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current stroke-[2]">
