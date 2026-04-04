@@ -22,7 +22,6 @@ type CommentItem = {
   user?: {
     display_name: string | null;
     avatar_url: string | null;
-    email: string;
   };
 };
 
@@ -100,7 +99,7 @@ export default function PostEngagement({ postId, postTitle, postSlug, siteUrl }:
 
     const { data } = await supabase
       .from("post_comments")
-      .select("id, user_id, post_id, content, created_at, users:users(display_name, avatar_url, email)")
+      .select("id, user_id, post_id, content, created_at, users:users(display_name, avatar_url)")
       .eq("post_id", postId)
       .order("created_at", { ascending: false });
 
@@ -111,7 +110,7 @@ export default function PostEngagement({ postId, postTitle, postSlug, siteUrl }:
         post_id: string;
         content: string;
         created_at: string;
-        users?: { display_name: string | null; avatar_url: string | null; email: string } | null;
+        users?: { display_name: string | null; avatar_url: string | null } | null;
       };
 
       return {
@@ -325,7 +324,7 @@ export default function PostEngagement({ postId, postTitle, postSlug, siteUrl }:
             <p className="py-3 text-sm text-slate-500 dark:text-slate-400">No comments yet.</p>
           ) : (
             comments.map((comment) => {
-              const label = comment.user?.display_name || comment.user?.email || "User";
+              const label = comment.user?.display_name || "User";
               const avatar = comment.user?.avatar_url || "";
 
               return (
