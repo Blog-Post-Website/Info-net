@@ -2,10 +2,23 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import type { ComponentPropsWithoutRef } from "react";
-import { getPublishedPostBySlug, getPublishedPosts } from "@/lib/supabase/queries";
+import {
+  getPostWithTags,
+  getPublishedPostBySlug,
+  getPublishedPosts,
+  getRecommendedPublishedPostsByTagIds,
+} from "@/lib/supabase/queries";
 import FormLink from "@/components/FormLink";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://infonet-flax.vercel.app";
+const contactEmail = "online.upskill.dev@gmail.com";
+
+const navLinks = [
+  { label: "Home", href: "/" },
+  { label: "About", href: "/about" },
+  { label: "Policy", href: "/policy" },
+  { label: "Contact", href: "/contact" },
+];
 
 type Params = {
   slug: string;
@@ -96,6 +109,20 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
   const topStories = sidebarPosts.slice(0, 4);
   const categoryPosts = sidebarPosts.slice(0, 2);
 
+  let recommendedPosts: Awaited<ReturnType<typeof getRecommendedPublishedPostsByTagIds>> = [];
+
+  try {
+    const postWithTags = await getPostWithTags(post.id);
+    const tagIds = postWithTags.tags.map((tag) => tag.id);
+    recommendedPosts = await getRecommendedPublishedPostsByTagIds({
+      tagIds,
+      excludePostId: post.id,
+      limit: 6,
+    });
+  } catch {
+    recommendedPosts = [];
+  }
+
   const summary = post.excerpt || post.meta_description || post.content.substring(0, 220);
   const hasHeroImage = typeof post.featured_image_url === "string" && post.featured_image_url.trim().length > 0;
 
@@ -143,9 +170,55 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950">
+    <div className="min-h-screen bg-[#f3f4f6] text-slate-900 dark:bg-gray-950">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+
+      <header className="border-b border-slate-200 bg-white/95 backdrop-blur dark:border-gray-800 dark:bg-gray-950/95">
+        <div className="mx-auto flex max-w-[92rem] items-center gap-6 px-4 py-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3">
+            <FormLink href="/" className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+              InfoNet
+            </FormLink>
+          </div>
+
+          <nav className="hidden flex-1 items-center justify-center gap-7 text-sm font-medium text-slate-700 dark:text-slate-200 lg:flex">
+            {navLinks.map((link) => (
+              <FormLink key={link.label} href={link.href} className="transition hover:text-blue-600">
+                {link.label}
+              </FormLink>
+            ))}
+          </nav>
+
+          <div className="ml-auto flex flex-1 items-center justify-end gap-6 lg:max-w-[760px]">
+            <form
+              action="/blog"
+              method="get"
+              className="flex w-full min-w-0 flex-1 max-w-[760px] items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-1.5 shadow-sm dark:border-gray-800 dark:bg-gray-950"
+            >
+              <button type="submit" className="text-slate-500 transition hover:text-slate-900 dark:hover:text-white" aria-label="Search blog">
+                <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current stroke-[2]">
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="m20 20-3.5-3.5" />
+                </svg>
+              </button>
+              <input
+                type="search"
+                name="search"
+                placeholder="Search"
+                className="w-full min-w-0 bg-transparent text-sm outline-none placeholder:text-slate-400"
+              />
+            </form>
+
+            <FormLink
+              href={`mailto:${contactEmail}?subject=InfoNet%20Subscribe%20Request`}
+              className="hidden rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 sm:inline-flex"
+            >
+              Subscribe Now
+            </FormLink>
+          </div>
+        </div>
+      </header>
 
       <div className="mx-auto max-w-[92rem] px-4 py-10 sm:px-6 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,2.8fr)_minmax(320px,0.85fr)]">
@@ -245,10 +318,84 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                 </ReactMarkdown>
               </article>
 
-              <div className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-700">
-                <FormLink href="/blog" className="font-medium text-blue-500 transition-colors hover:text-blue-600">
-                  {"<-"} Back to blog
-                </FormLink>
+              <div className="mt-12 space-y-6">
+                <section className="rounded-[28px] border border-slate-200 bg-[#101826] p-6 text-white shadow-[0_18px_45px_rgba(15,23,42,0.14)]">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">Subscribe</p>
+                  <h4 className="mt-3 text-3xl font-black leading-tight">Subscribe now for new posts</h4>
+                  <p className="mt-3 text-sm leading-6 text-slate-300">
+                    Get updates when we publish new stories.
+                  </p>
+                  <div className="mt-5 flex flex-wrap items-center gap-3">
+                    <FormLink
+                      href={`mailto:${contactEmail}?subject=InfoNet%20Subscribe%20Request`}
+                      className="rounded-xl bg-emerald-500 px-5 py-3 text-sm font-bold text-slate-900 transition hover:bg-emerald-400"
+                    >
+                      Subscribe Now
+                    </FormLink>
+                    <p className="text-xs text-slate-400">Send a message to {contactEmail}</p>
+                  </div>
+                </section>
+
+                <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-[0_18px_45px_rgba(15,23,42,0.08)] dark:border-gray-800 dark:bg-gray-950">
+                  <div className="mb-4 flex items-center justify-between">
+                    <h4 className="text-2xl font-black text-slate-900 dark:text-white">Recommended For You</h4>
+                  </div>
+
+                  <div className="divide-y divide-slate-100 dark:divide-gray-800">
+                    {recommendedPosts.length > 0 ? (
+                      recommendedPosts.map((item, index) => (
+                        <article key={item.id} className="py-4 first:pt-0 last:pb-0">
+                          <FormLink
+                            href={`/blog/${item.slug}`}
+                            className="grid w-full cursor-pointer grid-cols-[1fr_72px] items-start gap-4 text-left"
+                          >
+                            <div>
+                              <p className="line-clamp-2 text-lg font-bold leading-snug text-slate-900 transition hover:text-blue-600 dark:text-white">
+                                {item.title}
+                              </p>
+                              <p className="mt-2 text-xs font-medium text-slate-500 dark:text-slate-400">
+                                InfoNet • {new Date(item.published_at || item.created_at).toLocaleDateString("en-US", {
+                                  month: "short",
+                                  day: "2-digit",
+                                  year: "numeric",
+                                })}
+                              </p>
+                            </div>
+
+                            {item.featured_image_url ? (
+                              <img
+                                src={item.featured_image_url}
+                                alt=""
+                                className="h-16 w-16 rounded-xl object-cover"
+                                loading="lazy"
+                              />
+                            ) : (
+                              <div
+                                className={`h-16 w-16 rounded-xl ${
+                                  index % 3 === 0
+                                    ? "bg-[linear-gradient(120deg,#0369a1_0%,#22d3ee_100%)]"
+                                    : index % 3 === 1
+                                      ? "bg-[linear-gradient(120deg,#be123c_0%,#fb7185_100%)]"
+                                      : "bg-[linear-gradient(120deg,#334155_0%,#94a3b8_100%)]"
+                                }`}
+                              />
+                            )}
+                          </FormLink>
+                        </article>
+                      ))
+                    ) : (
+                      <p className="py-2 text-sm text-slate-500 dark:text-slate-400">
+                        No recommendations yet.
+                      </p>
+                    )}
+                  </div>
+                </section>
+
+                <div className="border-t border-gray-200 pt-6 dark:border-gray-700">
+                  <FormLink href="/blog" className="font-medium text-blue-500 transition-colors hover:text-blue-600">
+                    {"<-"} Back to blog
+                  </FormLink>
+                </div>
               </div>
             </div>
           </div>
@@ -257,7 +404,6 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
             <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-[0_18px_45px_rgba(15,23,42,0.08)] dark:border-gray-800 dark:bg-gray-950 sm:p-6">
               <div className="mb-5 flex items-center justify-between">
                 <h3 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Related Post</h3>
-                <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">Now</span>
               </div>
               <div className="divide-y divide-slate-100 dark:divide-gray-800">
                 {relatedPosts.length > 0 ? (
@@ -309,7 +455,6 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
             <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-[0_18px_45px_rgba(15,23,42,0.08)] dark:border-gray-800 dark:bg-gray-950 sm:p-6">
               <div className="mb-5 flex items-center justify-between">
                 <h3 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Top Stories</h3>
-                <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">Now</span>
               </div>
               <div className="divide-y divide-slate-100 dark:divide-gray-800">
                 {topStories.length > 0 ? (

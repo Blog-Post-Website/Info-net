@@ -66,6 +66,44 @@ export async function getPostWithTags(postId: string, userId?: string) {
 }
 
 /**
+ * Get recommended published posts that share any of the provided tag IDs.
+ * Excludes the current post ID and de-dupes results.
+ */
+export async function getRecommendedPublishedPostsByTagIds(options: {
+  tagIds: string[];
+  excludePostId: string;
+  limit?: number;
+}) {
+  const { tagIds, excludePostId, limit = 6 } = options;
+
+  if (!tagIds.length) return [];
+
+  const { data, error } = await supabase
+    .from("post_tags")
+    .select("posts:posts!inner(*)")
+    .in("tag_id", tagIds)
+    .neq("post_id", excludePostId)
+    .eq("posts.status", "published")
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+
+  const seen = new Set<string>();
+  const result: Post[] = [];
+
+  for (const row of data || []) {
+    const post = (row as unknown as { posts: Post | null }).posts;
+    if (!post) continue;
+    if (seen.has(post.id)) continue;
+    seen.add(post.id);
+    result.push(post);
+    if (result.length >= limit) break;
+  }
+
+  return result;
+}
+
+/**
  * Create a new draft post
  */
 export async function createPost(post: PostInsert) {
