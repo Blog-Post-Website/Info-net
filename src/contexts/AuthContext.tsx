@@ -23,6 +23,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const isAdmin = !!user?.email && user.email.toLowerCase() === adminEmail;
 
   useEffect(() => {
+    const upsertPublicUser = async () => {
+      if (!user?.id || !user.email) return;
+
+      const displayNameRaw = (user.user_metadata as Record<string, unknown> | undefined)?.full_name;
+      const avatarUrlRaw = (user.user_metadata as Record<string, unknown> | undefined)?.avatar_url;
+
+      const email = user.email.trim();
+      const display_name = typeof displayNameRaw === "string" && displayNameRaw.trim() ? displayNameRaw.trim() : email.split("@")[0] || null;
+      const avatar_url = typeof avatarUrlRaw === "string" && avatarUrlRaw.trim() ? avatarUrlRaw.trim() : null;
+
+      try {
+        await supabase
+          .from("users")
+          .upsert(
+            {
+              id: user.id,
+              email,
+              display_name,
+              avatar_url,
+              updated_at: new Date().toISOString(),
+            },
+            { onConflict: "id" }
+          );
+      } catch {
+        // Ignore: this is best-effort and is also ensured on server-side admin writes.
+      }
+    };
+
+    void upsertPublicUser();
+  }, [user]);
+
+  useEffect(() => {
     // Check current session
     const initializeAuth = async () => {
       try {

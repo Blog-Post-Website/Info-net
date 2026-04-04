@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
 import FormLink from "@/components/FormLink";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Post {
   id: string;
@@ -123,11 +123,25 @@ const featuredTiles = [
 const contactEmail = "online.upskill.dev@gmail.com";
 
 export default function HomePage() {
-  const { user, isAdmin, loading } = useAuth();
+  const { user, signOut } = useAuth();
   const router = useRouter();
   const [posts, setPosts] = useState<Post[]>([]);
   const [postsLoading, setPostsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+
+  const displayName = useMemo(() => {
+    if (!user) return "";
+    const metadata = user.user_metadata as Record<string, unknown> | undefined;
+    const name = typeof metadata?.full_name === "string" ? metadata.full_name.trim() : "";
+    return name || user.email || "";
+  }, [user]);
+
+  const avatarUrl = useMemo(() => {
+    if (!user) return "";
+    const metadata = user.user_metadata as Record<string, unknown> | undefined;
+    const url = typeof metadata?.avatar_url === "string" ? metadata.avatar_url.trim() : "";
+    return url;
+  }, [user]);
 
   const goToStory = (story: Story) => {
     if (!story.live) return;
@@ -231,7 +245,7 @@ export default function HomePage() {
             ))}
           </nav>
 
-          <div className="ml-auto flex flex-1 items-center justify-end gap-6 lg:max-w-[760px]">
+          <div className="ml-auto flex flex-1 items-center justify-end gap-4 lg:max-w-[760px]">
             <form
               onSubmit={handleSearchSubmit}
               className="flex w-full min-w-0 flex-1 max-w-[760px] items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-1.5 shadow-sm"
@@ -250,6 +264,45 @@ export default function HomePage() {
                 className="w-full min-w-0 bg-transparent text-sm outline-none placeholder:text-slate-400"
               />
             </form>
+
+            {!user ? (
+              <div className="hidden items-center gap-2 sm:flex">
+                <FormLink
+                  href={`/auth/login?next=${encodeURIComponent("/")}`}
+                  className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                >
+                  Sign In
+                </FormLink>
+                <FormLink
+                  href={`/auth/signup?next=${encodeURIComponent("/")}`}
+                  className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+                >
+                  Register
+                </FormLink>
+              </div>
+            ) : (
+              <div className="hidden items-center gap-3 sm:flex">
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="" className="h-9 w-9 rounded-full object-cover" />
+                ) : (
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-sm font-bold text-white">
+                    {(displayName || user.email || "U")[0]?.toUpperCase()}
+                  </div>
+                )}
+                <p className="max-w-[180px] truncate text-sm font-semibold text-slate-900">{displayName}</p>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await signOut();
+                    router.refresh();
+                  }}
+                  className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+
             <FormLink
               href={`mailto:${contactEmail}?subject=InfoNet%20Subscribe%20Request`}
               className="hidden rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 sm:inline-flex"

@@ -12,7 +12,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push("/auth/login");
+      router.push("/auth/admin-login");
     }
   }, [user, loading, router]);
 
@@ -20,7 +20,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const revokeNonAdminSession = async () => {
       if (!loading && user && !isAdmin) {
         await signOut();
-        router.push("/auth/login?error=not-admin");
+        router.push("/auth/admin-login?error=not-admin");
       }
     };
 
@@ -43,7 +43,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     setIsSigningOut(true);
     try {
       await signOut();
-      router.push("/auth/login");
+      router.push("/auth/admin-login");
     } catch (error) {
       console.error("Sign out failed:", error);
       setIsSigningOut(false);

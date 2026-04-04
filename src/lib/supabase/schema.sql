@@ -5,6 +5,8 @@ CREATE TYPE post_status AS ENUM ('draft', 'published', 'archived');
 CREATE TABLE IF NOT EXISTS public.users (
   id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
   email TEXT NOT NULL UNIQUE,
+  display_name TEXT,
+  avatar_url TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
 );
@@ -67,6 +69,24 @@ CREATE TABLE IF NOT EXISTS public.post_versions (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
 );
 
+-- Post likes table
+CREATE TABLE IF NOT EXISTS public.post_likes (
+  post_id UUID NOT NULL REFERENCES public.posts(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  PRIMARY KEY (post_id, user_id)
+);
+
+-- Post comments table
+CREATE TABLE IF NOT EXISTS public.post_comments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  post_id UUID NOT NULL REFERENCES public.posts(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  content TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
 -- Create indexes for better query performance
 CREATE INDEX IF NOT EXISTS idx_posts_user_id ON public.posts(user_id);
 CREATE INDEX IF NOT EXISTS idx_posts_status ON public.posts(status);
@@ -77,6 +97,9 @@ CREATE INDEX IF NOT EXISTS idx_tags_user_id ON public.tags(user_id);
 CREATE INDEX IF NOT EXISTS idx_post_tags_tag_id ON public.post_tags(tag_id);
 CREATE INDEX IF NOT EXISTS idx_post_versions_post_id ON public.post_versions(post_id);
 CREATE INDEX IF NOT EXISTS idx_post_versions_created_at ON public.post_versions(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_post_likes_post_id ON public.post_likes(post_id);
+CREATE INDEX IF NOT EXISTS idx_post_comments_post_id ON public.post_comments(post_id);
+CREATE INDEX IF NOT EXISTS idx_post_comments_created_at ON public.post_comments(created_at DESC);
 
 -- Enable RLS
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
@@ -85,6 +108,8 @@ ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.tags ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.post_tags ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.post_versions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.post_likes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.post_comments ENABLE ROW LEVEL SECURITY;
 
 -- Users RLS Policies
 CREATE POLICY "Users can read their own record" ON public.users
@@ -189,3 +214,59 @@ CREATE POLICY "Users can read versions of their own posts" ON public.post_versio
 CREATE POLICY "Users can create versions for their own posts" ON public.post_versions
   FOR INSERT
   WITH CHECK (auth.uid() = user_id);
+
+-- Post Likes RLS Policies
+CREATE POLICY "Anyone can read likes on published posts" ON public.post_likes
+  FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM posts p
+      WHERE p.id = post_id
+      AND p.status = 'published'
+    )
+  );
+
+CREATE POLICY "Users can like published posts" ON public.post_likes
+  FOR INSERT
+  WITH CHECK (
+    auth.uid() = user_id
+    AND EXISTS (
+      SELECT 1 FROM posts p
+      WHERE p.id = post_id
+      AND p.status = 'published'
+    )
+  );
+
+CREATE POLICY "Users can unlike their likes" ON public.post_likes
+  FOR DELETE
+  USING (auth.uid() = user_id);
+
+-- Post Comments RLS Policies
+CREATE POLICY "Anyone can read comments on published posts" ON public.post_comments
+  FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM posts p
+      WHERE p.id = post_id
+      AND p.status = 'published'
+    )
+  );
+
+CREATE POLICY "Users can comment on published posts" ON public.post_comments
+  FOR INSERT
+  WITH CHECK (
+    auth.uid() = user_id
+    AND EXISTS (
+      SELECT 1 FROM posts p
+      WHERE p.id = post_id
+      AND p.status = 'published'
+    )
+  );
+
+CREATE POLICY "Users can update their own comments" ON public.post_comments
+  FOR UPDATE
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own comments" ON public.post_comments
+  FOR DELETE
+  USING (auth.uid() = user_id);

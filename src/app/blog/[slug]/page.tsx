@@ -9,16 +9,11 @@ import {
   getRecommendedPublishedPostsByTagIds,
 } from "@/lib/supabase/queries";
 import FormLink from "@/components/FormLink";
+import PublicHeader from "@/components/PublicHeader";
+import PostEngagement from "@/components/PostEngagement";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://infonet-flax.vercel.app";
 const contactEmail = "online.upskill.dev@gmail.com";
-
-const navLinks = [
-  { label: "Home", href: "/" },
-  { label: "About", href: "/about" },
-  { label: "Policy", href: "/policy" },
-  { label: "Contact", href: "/contact" },
-];
 
 type Params = {
   slug: string;
@@ -174,51 +169,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
-      <header className="border-b border-slate-200 bg-white/95 backdrop-blur dark:border-gray-800 dark:bg-gray-950/95">
-        <div className="mx-auto flex max-w-[92rem] items-center gap-6 px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-3">
-            <FormLink href="/" className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
-              InfoNet
-            </FormLink>
-          </div>
-
-          <nav className="hidden flex-1 items-center justify-center gap-7 text-sm font-medium text-slate-700 dark:text-slate-200 lg:flex">
-            {navLinks.map((link) => (
-              <FormLink key={link.label} href={link.href} className="transition hover:text-blue-600">
-                {link.label}
-              </FormLink>
-            ))}
-          </nav>
-
-          <div className="ml-auto flex flex-1 items-center justify-end gap-6 lg:max-w-[760px]">
-            <form
-              action="/blog"
-              method="get"
-              className="flex w-full min-w-0 flex-1 max-w-[760px] items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-1.5 shadow-sm dark:border-gray-800 dark:bg-gray-950"
-            >
-              <button type="submit" className="text-slate-500 transition hover:text-slate-900 dark:hover:text-white" aria-label="Search blog">
-                <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current stroke-[2]">
-                  <circle cx="11" cy="11" r="7" />
-                  <path d="m20 20-3.5-3.5" />
-                </svg>
-              </button>
-              <input
-                type="search"
-                name="search"
-                placeholder="Search"
-                className="w-full min-w-0 bg-transparent text-sm outline-none placeholder:text-slate-400"
-              />
-            </form>
-
-            <FormLink
-              href={`mailto:${contactEmail}?subject=InfoNet%20Subscribe%20Request`}
-              className="hidden rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 sm:inline-flex"
-            >
-              Subscribe Now
-            </FormLink>
-          </div>
-        </div>
-      </header>
+      <PublicHeader />
 
       <div className="mx-auto max-w-[92rem] px-4 py-10 sm:px-6 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,2.8fr)_minmax(320px,0.85fr)]">
@@ -319,6 +270,8 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
               </article>
 
               <div className="mt-12 space-y-6">
+                <PostEngagement postId={post.id} postTitle={post.title} postSlug={post.slug} siteUrl={siteUrl} />
+
                 <section className="rounded-[28px] border border-slate-200 bg-[#101826] p-6 text-white shadow-[0_18px_45px_rgba(15,23,42,0.14)]">
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">Subscribe</p>
                   <h4 className="mt-3 text-3xl font-black leading-tight">Subscribe now for new posts</h4>

@@ -1,4 +1,12 @@
-export default function SignupSuccessPage() {
+export default async function SignupSuccessPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
+  const nextRaw = params.next;
+  const next = typeof nextRaw === "string" ? nextRaw : "";
+
   return (
     <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 px-4">
       <div className="w-full max-w-md rounded-2xl border border-emerald-200 bg-white p-8 shadow-lg text-center">
@@ -15,7 +23,10 @@ export default function SignupSuccessPage() {
 
         <p className="mt-6 text-sm text-slate-500">
           Once confirmed, you can{" "}
-          <a href="/auth/login" className="font-medium text-emerald-600 hover:text-emerald-700">
+          <a
+            href={next ? `/auth/login?next=${encodeURIComponent(next)}` : "/auth/login"}
+            className="font-medium text-emerald-600 hover:text-emerald-700"
+          >
             sign in here
           </a>
           .

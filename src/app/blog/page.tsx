@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getPublishedPosts } from "@/lib/supabase/queries";
 import FormLink from "@/components/FormLink";
+import PublicHeader from "@/components/PublicHeader";
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -61,6 +62,7 @@ export default async function BlogPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
+      <PublicHeader />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogJsonLd) }}

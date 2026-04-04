@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import FormLink from "@/components/FormLink";
+import PublicHeader from "@/components/PublicHeader";
 
 export const metadata: Metadata = {
   title: "Policy",
@@ -16,6 +17,7 @@ const policyItems = [
 export default function PolicyPage() {
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
+      <PublicHeader />
       <section className="mx-auto max-w-5xl px-6 py-16 sm:px-10">
         <div className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-[0_18px_45px_rgba(15,23,42,0.08)] sm:p-12">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">Policy</p>
