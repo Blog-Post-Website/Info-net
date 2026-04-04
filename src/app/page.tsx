@@ -281,7 +281,10 @@ export default function HomePage() {
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {featuredStories.map((story, index) => (
-                <article key={story.id} className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                <article
+                  key={story.id}
+                  className={`overflow-hidden rounded-xl border border-slate-200 bg-white ${story.live ? "cursor-pointer" : "cursor-default"}`}
+                >
                   <div className={`relative h-40 ${story.imageUrl ? "bg-slate-900" : featuredTiles[index % featuredTiles.length]}`}>
                     {story.imageUrl ? (
                       <img
@@ -336,7 +339,7 @@ export default function HomePage() {
             </div>
             <div className="divide-y divide-slate-100">
               {topStories.map((story, index) => (
-                <article key={story.id} className="py-4 first:pt-0 last:pb-0">
+                <article key={story.id} className={`py-4 first:pt-0 last:pb-0 ${story.live ? "cursor-pointer" : "cursor-default"}`}>
                   <div className="grid grid-cols-[1fr_72px] items-start gap-4">
                     <div>
                       {renderStoryLink(story, "line-clamp-2 text-lg font-bold leading-snug transition hover:text-blue-600")}
@@ -383,7 +386,10 @@ export default function HomePage() {
 
             <div className="space-y-4">
               {(searchQuery ? filteredLatest : latestStories).map((story, index) => (
-                <article key={story.id} className="grid gap-4 border-b border-slate-100 pb-4 last:border-0 last:pb-0 sm:grid-cols-[140px_1fr]">
+                <article
+                  key={story.id}
+                  className={`grid gap-4 border-b border-slate-100 pb-4 last:border-0 last:pb-0 sm:grid-cols-[140px_1fr] ${story.live ? "cursor-pointer" : "cursor-default"}`}
+                >
                   {story.imageUrl ? (
                     <img
                       src={story.imageUrl}
