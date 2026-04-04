@@ -245,10 +245,10 @@ export default function HomePage() {
             ))}
           </nav>
 
-          <div className="ml-auto flex flex-1 items-center justify-end gap-4 lg:max-w-[760px]">
+          <div className="ml-auto flex flex-1 items-center justify-end gap-4 lg:max-w-[920px]">
             <form
               onSubmit={handleSearchSubmit}
-              className="flex w-full min-w-0 flex-1 max-w-[760px] items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-1.5 shadow-sm"
+              className="flex w-full min-w-0 flex-1 max-w-[920px] items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-1.5 shadow-sm"
             >
               <button type="submit" className="text-slate-500 transition hover:text-slate-900" aria-label="Search blog">
                 <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current stroke-[2]">
@@ -302,13 +302,6 @@ export default function HomePage() {
                 </button>
               </div>
             )}
-
-            <FormLink
-              href={`mailto:${contactEmail}?subject=InfoNet%20Subscribe%20Request`}
-              className="hidden rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 sm:inline-flex"
-            >
-              Subscribe Now
-            </FormLink>
           </div>
         </div>
       </header>
@@ -322,12 +315,6 @@ export default function HomePage() {
               </FormLink>
             ))}
           </div>
-          <FormLink
-            href={`mailto:${contactEmail}?subject=InfoNet%20Subscribe%20Request`}
-            className="rounded-full bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700"
-          >
-            Subscribe Now
-          </FormLink>
         </div>
 
         <section className="grid gap-6 xl:grid-cols-[minmax(0,2.8fr)_minmax(320px,0.85fr)]">
