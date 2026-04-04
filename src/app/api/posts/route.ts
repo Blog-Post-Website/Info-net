@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server-client";
 import { getAccessTokenFromRequest, getUserFromRequest } from "@/lib/supabase/auth";
+import { ensurePublicUserRow } from "@/lib/supabase/ensure-user";
 import { buildRateLimitKey, checkRateLimit } from "@/lib/api/rate-limit";
 import { parseJsonBody, validateCreatePostPayload } from "@/lib/api/validation";
 import { apiError, apiSuccess, createApiContext, isValidationLikeError, logApiError } from "@/lib/api/response";
@@ -38,6 +39,11 @@ function mapCreatePostError(error: unknown): { status: number; message: string }
     return { status: 400, message: "Invalid input." };
   }
 
+  // Foreign key violation (usually missing public.users row)
+  if (pg.code === "23503" || msg.includes("posts_user_id_fkey")) {
+    return { status: 409, message: "Your user profile is not initialized in the database. Please sign out and sign in again." };
+  }
+
   return null;
 }
 
@@ -57,6 +63,9 @@ export async function POST(req: NextRequest) {
     }
 
     const supabase = createSupabaseServerClient(accessToken);
+
+    // Ensure FK target exists: posts.user_id -> public.users.id
+    await ensurePublicUserRow(supabase, user);
 
     const rate = checkRateLimit({
       key: buildRateLimitKey(req, "post-create", user.id),

@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server-client";
 import { getAccessTokenFromRequest, getUserFromRequest } from "@/lib/supabase/auth";
+import { ensurePublicUserRow } from "@/lib/supabase/ensure-user";
 import { buildRateLimitKey, checkRateLimit } from "@/lib/api/rate-limit";
 import { parseJsonBody, validateUpdatePostPayload } from "@/lib/api/validation";
 import { apiError, apiSuccess, createApiContext, isValidationLikeError, logApiError } from "@/lib/api/response";
@@ -59,6 +60,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     }
 
     const supabase = createSupabaseServerClient(accessToken);
+
+    // Ensure FK target exists: posts.user_id -> public.users.id
+    await ensurePublicUserRow(supabase, user);
 
     const rate = checkRateLimit({
       key: buildRateLimitKey(req, `post-update:${postId}`, user.id),
