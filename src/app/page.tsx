@@ -245,10 +245,10 @@ export default function HomePage() {
             ))}
           </nav>
 
-          <div className="ml-auto flex flex-1 items-center justify-end gap-4 lg:max-w-[920px]">
+          <div className="ml-auto flex flex-1 items-center justify-end gap-4 lg:gap-8 lg:max-w-[1100px]">
             <form
               onSubmit={handleSearchSubmit}
-              className="flex w-full min-w-0 flex-1 max-w-[920px] items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-1.5 shadow-sm"
+              className="flex w-full min-w-0 flex-1 max-w-[1100px] items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-1.5 shadow-sm"
             >
               <button type="submit" className="text-slate-500 transition hover:text-slate-900" aria-label="Search blog">
                 <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current stroke-[2]">
