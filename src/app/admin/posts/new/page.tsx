@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import MarkdownEditor from "@/components/MarkdownEditor";
 import { useAuth } from "@/contexts/AuthContext";
 import { authFetch } from "@/lib/auth-fetch";
+import { uploadThumbnailFromDevice } from "@/lib/supabase/storage";
 
 function normalizeSlug(raw: string) {
   const base = raw
@@ -20,9 +21,25 @@ function normalizeSlug(raw: string) {
 
 export default function NewPostPage() {
   const router = useRouter();
-  const { loading } = useAuth();
+  const { loading, user } = useAuth();
   const [slug, setSlug] = useState("");
   const [featuredImageUrl, setFeaturedImageUrl] = useState("");
+  const [thumbnailUploading, setThumbnailUploading] = useState(false);
+  const [thumbnailUploadError, setThumbnailUploadError] = useState("");
+
+  const handleThumbnailUpload = async (file: File) => {
+    setThumbnailUploadError("");
+    setThumbnailUploading(true);
+    try {
+      const url = await uploadThumbnailFromDevice(file, user?.id);
+      setFeaturedImageUrl(url);
+    } catch (err) {
+      console.error("Thumbnail upload failed:", err);
+      setThumbnailUploadError(err instanceof Error ? err.message : "Failed to upload thumbnail");
+    } finally {
+      setThumbnailUploading(false);
+    }
+  };
 
   const handleSave = async (title: string, content: string) => {
     const normalizedSlug = normalizeSlug(slug);
@@ -118,6 +135,29 @@ export default function NewPostPage() {
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
           />
           <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">Use a direct http(s) image URL (jpg/png/webp).</p>
+
+          <div className="mt-3">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Or upload from device
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              disabled={thumbnailUploading}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                e.target.value = "";
+                if (file) void handleThumbnailUpload(file);
+              }}
+              className="block w-full text-sm text-gray-700 dark:text-gray-300 file:mr-3 file:rounded-lg file:border file:border-gray-300 file:bg-white file:px-4 file:py-2 file:text-sm file:font-medium file:text-gray-700 hover:file:bg-gray-50 dark:file:border-gray-600 dark:file:bg-gray-800 dark:file:text-gray-200 dark:hover:file:bg-gray-700"
+            />
+            {thumbnailUploading ? (
+              <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">Uploading...</p>
+            ) : null}
+            {thumbnailUploadError ? (
+              <p className="mt-2 text-xs text-red-600">{thumbnailUploadError}</p>
+            ) : null}
+          </div>
         </div>
 
         {/* Editor */}
