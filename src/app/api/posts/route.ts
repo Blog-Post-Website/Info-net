@@ -24,6 +24,22 @@ function mapCreatePostError(error: unknown): { status: number; message: string }
 
   const msg = (pg.message ?? "").toLowerCase();
 
+  // Missing public.users row or missing RLS policy for public.users
+  if (
+    msg.includes("public.users") ||
+    msg.includes(" table \"users\"") ||
+    msg.includes("relation \"users\"") ||
+    msg.includes("posts_user_id_fkey")
+  ) {
+    if (pg.code === "23503" || pg.code === "42501" || msg.includes("row-level security") || msg.includes("permission denied")) {
+      return {
+        status: 500,
+        message:
+          "Database setup required: add an INSERT policy on public.users, then retry. In Supabase SQL Editor run: create policy \"Users can insert their own record\" on public.users for insert with check (auth.uid() = id);",
+      };
+    }
+  }
+
   // Unique constraint / duplicate value
   if (pg.code === "23505" || msg.includes("duplicate")) {
     return { status: 409, message: "Slug already exists. Please choose a different slug." };
@@ -37,11 +53,6 @@ function mapCreatePostError(error: unknown): { status: number; message: string }
   // Invalid text representation / bad input
   if (pg.code === "22P02") {
     return { status: 400, message: "Invalid input." };
-  }
-
-  // Foreign key violation (usually missing public.users row)
-  if (pg.code === "23503" || msg.includes("posts_user_id_fkey")) {
-    return { status: 409, message: "Your user profile is not initialized in the database. Please sign out and sign in again." };
   }
 
   return null;
