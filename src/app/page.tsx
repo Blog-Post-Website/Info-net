@@ -324,14 +324,14 @@ export default function HomePage() {
                       <span>{story.readTime}</span>
                     </div>
 
-                    {renderStoryLink(story, "block text-lg font-bold leading-snug transition hover:text-blue-600")}
+                    {renderStoryLink(story, "block cursor-pointer text-lg font-bold leading-snug transition hover:text-blue-600")}
 
                     <p className="mt-2 line-clamp-3 text-sm text-slate-600">{story.excerpt}</p>
 
                     <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-slate-700">
                       {story.live ? (
                         <span onClick={(event) => event.stopPropagation()}>
-                          <FormLink href={`/blog/${story.slug}`} className="transition hover:text-blue-700">
+                          <FormLink href={`/blog/${story.slug}`} className="cursor-pointer transition hover:text-blue-700">
                             Explore Now
                           </FormLink>
                         </span>
@@ -374,7 +374,7 @@ export default function HomePage() {
                 >
                   <div className="grid grid-cols-[1fr_72px] items-start gap-4">
                     <div>
-                      {renderStoryLink(story, "line-clamp-2 text-lg font-bold leading-snug transition hover:text-blue-600")}
+                      {renderStoryLink(story, "line-clamp-2 cursor-pointer text-lg font-bold leading-snug transition hover:text-blue-600")}
                       <p className="mt-2 text-xs font-medium text-slate-500">
                         InfoNet • {story.date}
                       </p>
@@ -451,7 +451,7 @@ export default function HomePage() {
                     />
                   )}
                   <div>
-                    {renderStoryLink(story, "text-2xl font-black leading-tight transition hover:text-blue-600")}
+                    {renderStoryLink(story, "cursor-pointer text-2xl font-black leading-tight transition hover:text-blue-600")}
                     <p className="mt-2 text-sm text-slate-600">{story.excerpt}</p>
                     <p className="mt-2 text-xs font-medium uppercase tracking-[0.1em] text-slate-500">
                       {story.category} • {story.date}
