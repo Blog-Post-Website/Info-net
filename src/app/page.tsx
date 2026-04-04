@@ -129,6 +129,11 @@ export default function HomePage() {
   const [postsLoading, setPostsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const goToStory = (story: Story) => {
+    if (!story.live) return;
+    router.push(`/blog/${story.slug}`);
+  };
+
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -191,9 +196,11 @@ export default function HomePage() {
     }
 
     return (
-      <FormLink href={`/blog/${story.slug}`} className={className}>
-        {story.title}
-      </FormLink>
+      <span onClick={(event) => event.stopPropagation()}>
+        <FormLink href={`/blog/${story.slug}`} className={className}>
+          {story.title}
+        </FormLink>
+      </span>
     );
   };
 
@@ -284,6 +291,16 @@ export default function HomePage() {
                 <article
                   key={story.id}
                   className={`overflow-hidden rounded-xl border border-slate-200 bg-white ${story.live ? "cursor-pointer" : "cursor-default"}`}
+                  role={story.live ? "link" : undefined}
+                  tabIndex={story.live ? 0 : -1}
+                  onClick={() => goToStory(story)}
+                  onKeyDown={(event) => {
+                    if (!story.live) return;
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      goToStory(story);
+                    }
+                  }}
                 >
                   <div className={`relative h-40 ${story.imageUrl ? "bg-slate-900" : featuredTiles[index % featuredTiles.length]}`}>
                     {story.imageUrl ? (
@@ -313,9 +330,11 @@ export default function HomePage() {
 
                     <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-slate-700">
                       {story.live ? (
-                        <FormLink href={`/blog/${story.slug}`} className="transition hover:text-blue-700">
-                          Explore Now
-                        </FormLink>
+                        <span onClick={(event) => event.stopPropagation()}>
+                          <FormLink href={`/blog/${story.slug}`} className="transition hover:text-blue-700">
+                            Explore Now
+                          </FormLink>
+                        </span>
                       ) : (
                         <span>Explore Now</span>
                       )}
@@ -339,7 +358,20 @@ export default function HomePage() {
             </div>
             <div className="divide-y divide-slate-100">
               {topStories.map((story, index) => (
-                <article key={story.id} className={`py-4 first:pt-0 last:pb-0 ${story.live ? "cursor-pointer" : "cursor-default"}`}>
+                <article
+                  key={story.id}
+                  className={`py-4 first:pt-0 last:pb-0 ${story.live ? "cursor-pointer" : "cursor-default"}`}
+                  role={story.live ? "link" : undefined}
+                  tabIndex={story.live ? 0 : -1}
+                  onClick={() => goToStory(story)}
+                  onKeyDown={(event) => {
+                    if (!story.live) return;
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      goToStory(story);
+                    }
+                  }}
+                >
                   <div className="grid grid-cols-[1fr_72px] items-start gap-4">
                     <div>
                       {renderStoryLink(story, "line-clamp-2 text-lg font-bold leading-snug transition hover:text-blue-600")}
@@ -389,6 +421,16 @@ export default function HomePage() {
                 <article
                   key={story.id}
                   className={`grid gap-4 border-b border-slate-100 pb-4 last:border-0 last:pb-0 sm:grid-cols-[140px_1fr] ${story.live ? "cursor-pointer" : "cursor-default"}`}
+                  role={story.live ? "link" : undefined}
+                  tabIndex={story.live ? 0 : -1}
+                  onClick={() => goToStory(story)}
+                  onKeyDown={(event) => {
+                    if (!story.live) return;
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      goToStory(story);
+                    }
+                  }}
                 >
                   {story.imageUrl ? (
                     <img
