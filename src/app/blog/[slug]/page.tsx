@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import type { ComponentPropsWithoutRef } from "react";
-import { getPublishedPostBySlug } from "@/lib/supabase/queries";
+import { getPublishedPostBySlug, getPublishedPosts } from "@/lib/supabase/queries";
 import FormLink from "@/components/FormLink";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://infonet-flax.vercel.app";
@@ -83,6 +83,19 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
     notFound();
   }
 
+  let publishedPosts: Awaited<ReturnType<typeof getPublishedPosts>> = [];
+
+  try {
+    publishedPosts = (await getPublishedPosts()) || [];
+  } catch {
+    publishedPosts = [];
+  }
+
+  const sidebarPosts = publishedPosts.filter((candidate) => candidate.slug !== post.slug);
+  const relatedPosts = sidebarPosts.slice(0, 2);
+  const topStories = sidebarPosts.slice(0, 4);
+  const categoryPosts = sidebarPosts.slice(0, 2);
+
   const summary = post.excerpt || post.meta_description || post.content.substring(0, 220);
   const hasHeroImage = typeof post.featured_image_url === "string" && post.featured_image_url.trim().length > 0;
 
@@ -134,107 +147,268 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
-      <div className="mx-auto max-w-5xl px-4 py-10">
-        <header className={hasHeroImage ? "grid gap-8 lg:grid-cols-[1.25fr_1fr]" : ""}>
-          {hasHeroImage ? (
-            <div className="overflow-hidden rounded-2xl border border-gray-200 bg-gray-100 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-              <img
-                src={post.featured_image_url as string}
-                alt={post.title}
-                className="h-full w-full object-cover"
-              />
-            </div>
-          ) : null}
-
+      <div className="mx-auto max-w-[92rem] px-4 py-10 sm:px-6 lg:px-8">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,2.8fr)_minmax(320px,0.85fr)]">
           <div>
-            <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-white sm:text-5xl">
-              {post.title}
-            </h1>
-            <p className="mt-3 text-sm font-medium text-slate-500 dark:text-slate-400">
-              <time dateTime={post.published_at || post.created_at}>
-                {new Date(post.published_at || post.created_at).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </time>
-            </p>
-
-            <p className="mt-6 text-base leading-7 text-slate-700 dark:text-slate-300">{summary}</p>
-          </div>
-        </header>
-
-        <div className="mt-10">
-          <article className="prose max-w-none dark:prose-invert prose-a:no-underline">
-            <ReactMarkdown
-              components={{
-                h1: ({ ...props }) => (
-                  <h1 className="mt-8 mb-4 text-3xl font-bold text-gray-900 dark:text-white" {...props} />
-                ),
-                h2: ({ ...props }) => (
-                  <h2 className="mt-6 mb-3 text-2xl font-bold text-gray-900 dark:text-white" {...props} />
-                ),
-                h3: ({ ...props }) => (
-                  <h3 className="mt-5 mb-2 text-xl font-bold text-gray-900 dark:text-white" {...props} />
-                ),
-                p: ({ ...props }) => <p className="mb-4 leading-relaxed text-gray-700 dark:text-gray-300" {...props} />,
-                ul: ({ ...props }) => (
-                  <ul className="mb-4 list-inside list-disc space-y-2 text-gray-700 dark:text-gray-300" {...props} />
-                ),
-                ol: ({ ...props }) => (
-                  <ol className="mb-4 list-inside list-decimal space-y-2 text-gray-700 dark:text-gray-300" {...props} />
-                ),
-                li: ({ ...props }) => <li className="ml-2" {...props} />,
-                blockquote: ({ ...props }) => (
-                  <blockquote
-                    className="my-4 border-l-4 border-blue-500 pl-4 italic text-gray-600 dark:text-gray-400"
-                    {...props}
+            <header className={hasHeroImage ? "grid gap-8 lg:grid-cols-[1.25fr_1fr]" : ""}>
+              {hasHeroImage ? (
+                <div className="overflow-hidden rounded-2xl border border-gray-200 bg-gray-100 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+                  <img
+                    src={post.featured_image_url as string}
+                    alt={post.title}
+                    className="h-full w-full object-cover"
                   />
-                ),
-                img: ({ src, alt, ...props }: MarkdownImageProps) => {
-                  if (!src) return null;
-                  return (
-                    <img
-                      src={src}
-                      alt={alt || ""}
-                      loading="lazy"
-                      className="mx-auto my-6 max-h-[520px] w-auto max-w-full rounded-2xl border border-gray-200 object-contain shadow-sm dark:border-gray-800"
-                      {...props}
-                    />
-                  );
-                },
-                code: (props: MarkdownCodeProps) =>
-                  props.inline ? (
-                    <code className="rounded bg-gray-100 px-2 py-1 font-mono text-sm dark:bg-gray-800" {...props} />
-                  ) : (
-                    <code
-                      className="my-4 block overflow-auto rounded bg-gray-100 p-4 font-mono text-sm dark:bg-gray-800"
-                      {...props}
-                    />
-                  ),
-                pre: ({ ...props }) => <pre className="mb-4" {...props} />,
-                a: ({ children, href }) => {
-                  if (!href) {
-                    return <span className="text-blue-500">{children}</span>;
-                  }
+                </div>
+              ) : null}
 
-                  return (
-                    <FormLink href={href} className="text-blue-500 transition hover:text-blue-600">
-                      {children}
-                    </FormLink>
-                  );
-                },
-              }}
-            >
-              {post.content}
-            </ReactMarkdown>
-          </article>
+              <div>
+                <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-white sm:text-5xl">
+                  {post.title}
+                </h1>
+                <p className="mt-3 text-sm font-medium text-slate-500 dark:text-slate-400">
+                  <time dateTime={post.published_at || post.created_at}>
+                    {new Date(post.published_at || post.created_at).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </time>
+                </p>
 
-          <div className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-700">
-            <FormLink href="/blog" className="font-medium text-blue-500 transition-colors hover:text-blue-600">
-              {"<-"} Back to blog
-            </FormLink>
+                <p className="mt-6 text-base leading-7 text-slate-700 dark:text-slate-300">{summary}</p>
+              </div>
+            </header>
+
+            <div className="mt-10">
+              <article className="prose max-w-none dark:prose-invert prose-a:no-underline">
+                <ReactMarkdown
+                  components={{
+                    h1: ({ ...props }) => (
+                      <h1 className="mt-8 mb-4 text-3xl font-bold text-gray-900 dark:text-white" {...props} />
+                    ),
+                    h2: ({ ...props }) => (
+                      <h2 className="mt-6 mb-3 text-2xl font-bold text-gray-900 dark:text-white" {...props} />
+                    ),
+                    h3: ({ ...props }) => (
+                      <h3 className="mt-5 mb-2 text-xl font-bold text-gray-900 dark:text-white" {...props} />
+                    ),
+                    p: ({ ...props }) => <p className="mb-4 leading-relaxed text-gray-700 dark:text-gray-300" {...props} />,
+                    ul: ({ ...props }) => (
+                      <ul className="mb-4 list-inside list-disc space-y-2 text-gray-700 dark:text-gray-300" {...props} />
+                    ),
+                    ol: ({ ...props }) => (
+                      <ol className="mb-4 list-inside list-decimal space-y-2 text-gray-700 dark:text-gray-300" {...props} />
+                    ),
+                    li: ({ ...props }) => <li className="ml-2" {...props} />,
+                    blockquote: ({ ...props }) => (
+                      <blockquote
+                        className="my-4 border-l-4 border-blue-500 pl-4 italic text-gray-600 dark:text-gray-400"
+                        {...props}
+                      />
+                    ),
+                    img: ({ src, alt, ...props }: MarkdownImageProps) => {
+                      if (!src) return null;
+                      return (
+                        <img
+                          src={src}
+                          alt={alt || ""}
+                          loading="lazy"
+                          className="mx-auto my-6 max-h-[520px] w-auto max-w-full rounded-2xl border border-gray-200 object-contain shadow-sm dark:border-gray-800"
+                          {...props}
+                        />
+                      );
+                    },
+                    code: (props: MarkdownCodeProps) =>
+                      props.inline ? (
+                        <code className="rounded bg-gray-100 px-2 py-1 font-mono text-sm dark:bg-gray-800" {...props} />
+                      ) : (
+                        <code
+                          className="my-4 block overflow-auto rounded bg-gray-100 p-4 font-mono text-sm dark:bg-gray-800"
+                          {...props}
+                        />
+                      ),
+                    pre: ({ ...props }) => <pre className="mb-4" {...props} />,
+                    a: ({ children, href }) => {
+                      if (!href) {
+                        return <span className="text-blue-500">{children}</span>;
+                      }
+
+                      return (
+                        <FormLink href={href} className="text-blue-500 transition hover:text-blue-600">
+                          {children}
+                        </FormLink>
+                      );
+                    },
+                  }}
+                >
+                  {post.content}
+                </ReactMarkdown>
+              </article>
+
+              <div className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-700">
+                <FormLink href="/blog" className="font-medium text-blue-500 transition-colors hover:text-blue-600">
+                  {"<-"} Back to blog
+                </FormLink>
+              </div>
+            </div>
           </div>
+
+          <aside className="space-y-6">
+            <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-[0_18px_45px_rgba(15,23,42,0.08)] dark:border-gray-800 dark:bg-gray-950 sm:p-6">
+              <div className="mb-5 flex items-center justify-between">
+                <h3 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Related Post</h3>
+                <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">Now</span>
+              </div>
+              <div className="divide-y divide-slate-100 dark:divide-gray-800">
+                {relatedPosts.length > 0 ? (
+                  relatedPosts.map((item, index) => (
+                    <article key={item.id} className="py-4 first:pt-0 last:pb-0">
+                      <FormLink
+                        href={`/blog/${item.slug}`}
+                        className="grid w-full cursor-pointer grid-cols-[1fr_72px] items-start gap-4 text-left"
+                      >
+                        <div>
+                          <p className="line-clamp-2 text-lg font-bold leading-snug text-slate-900 transition hover:text-blue-600 dark:text-white">
+                            {item.title}
+                          </p>
+                          <p className="mt-2 text-xs font-medium text-slate-500 dark:text-slate-400">
+                            InfoNet • {new Date(item.published_at || item.created_at).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "2-digit",
+                              year: "numeric",
+                            })}
+                          </p>
+                        </div>
+                        {item.featured_image_url ? (
+                          <img
+                            src={item.featured_image_url}
+                            alt=""
+                            className="h-16 w-16 rounded-xl object-cover"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div
+                            className={`h-16 w-16 rounded-xl ${
+                              index % 3 === 0
+                                ? "bg-[linear-gradient(120deg,#0369a1_0%,#22d3ee_100%)]"
+                                : index % 3 === 1
+                                  ? "bg-[linear-gradient(120deg,#be123c_0%,#fb7185_100%)]"
+                                  : "bg-[linear-gradient(120deg,#334155_0%,#94a3b8_100%)]"
+                            }`}
+                          />
+                        )}
+                      </FormLink>
+                    </article>
+                  ))
+                ) : (
+                  <p className="py-2 text-sm text-slate-500 dark:text-slate-400">No related posts yet.</p>
+                )}
+              </div>
+            </section>
+
+            <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-[0_18px_45px_rgba(15,23,42,0.08)] dark:border-gray-800 dark:bg-gray-950 sm:p-6">
+              <div className="mb-5 flex items-center justify-between">
+                <h3 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Top Stories</h3>
+                <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">Now</span>
+              </div>
+              <div className="divide-y divide-slate-100 dark:divide-gray-800">
+                {topStories.length > 0 ? (
+                  topStories.map((item, index) => (
+                    <article key={item.id} className="py-4 first:pt-0 last:pb-0">
+                      <FormLink
+                        href={`/blog/${item.slug}`}
+                        className="grid w-full cursor-pointer grid-cols-[1fr_72px] items-start gap-4 text-left"
+                      >
+                        <div>
+                          <p className="line-clamp-2 text-lg font-bold leading-snug text-slate-900 transition hover:text-blue-600 dark:text-white">
+                            {item.title}
+                          </p>
+                          <p className="mt-2 text-xs font-medium text-slate-500 dark:text-slate-400">
+                            InfoNet • {new Date(item.published_at || item.created_at).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "2-digit",
+                              year: "numeric",
+                            })}
+                          </p>
+                        </div>
+                        {item.featured_image_url ? (
+                          <img
+                            src={item.featured_image_url}
+                            alt=""
+                            className="h-16 w-16 rounded-xl object-cover"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div
+                            className={`h-16 w-16 rounded-xl ${
+                              index % 3 === 0
+                                ? "bg-[linear-gradient(120deg,#0369a1_0%,#22d3ee_100%)]"
+                                : index % 3 === 1
+                                  ? "bg-[linear-gradient(120deg,#be123c_0%,#fb7185_100%)]"
+                                  : "bg-[linear-gradient(120deg,#334155_0%,#94a3b8_100%)]"
+                            }`}
+                          />
+                        )}
+                      </FormLink>
+                    </article>
+                  ))
+                ) : (
+                  <p className="py-2 text-sm text-slate-500 dark:text-slate-400">No top stories yet.</p>
+                )}
+              </div>
+            </section>
+
+            <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-[0_18px_45px_rgba(15,23,42,0.08)] dark:border-gray-800 dark:bg-gray-950 sm:p-6">
+              <div className="mb-5 flex items-center justify-between">
+                <h3 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Category</h3>
+              </div>
+              <div className="divide-y divide-slate-100 dark:divide-gray-800">
+                {categoryPosts.length > 0 ? (
+                  categoryPosts.map((item, index) => (
+                    <article key={item.id} className="py-4 first:pt-0 last:pb-0">
+                      <FormLink
+                        href={`/blog/${item.slug}`}
+                        className="grid w-full cursor-pointer grid-cols-[1fr_72px] items-start gap-4 text-left"
+                      >
+                        <div>
+                          <p className="line-clamp-2 text-lg font-bold leading-snug text-slate-900 transition hover:text-blue-600 dark:text-white">
+                            {item.title}
+                          </p>
+                          <p className="mt-2 text-xs font-medium text-slate-500 dark:text-slate-400">
+                            InfoNet • {new Date(item.published_at || item.created_at).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "2-digit",
+                              year: "numeric",
+                            })}
+                          </p>
+                        </div>
+                        {item.featured_image_url ? (
+                          <img
+                            src={item.featured_image_url}
+                            alt=""
+                            className="h-16 w-16 rounded-xl object-cover"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div
+                            className={`h-16 w-16 rounded-xl ${
+                              index % 3 === 0
+                                ? "bg-[linear-gradient(120deg,#0369a1_0%,#22d3ee_100%)]"
+                                : index % 3 === 1
+                                  ? "bg-[linear-gradient(120deg,#be123c_0%,#fb7185_100%)]"
+                                  : "bg-[linear-gradient(120deg,#334155_0%,#94a3b8_100%)]"
+                            }`}
+                          />
+                        )}
+                      </FormLink>
+                    </article>
+                  ))
+                ) : (
+                  <p className="py-2 text-sm text-slate-500 dark:text-slate-400">No categories yet.</p>
+                )}
+              </div>
+            </section>
+          </aside>
         </div>
       </div>
     </div>
