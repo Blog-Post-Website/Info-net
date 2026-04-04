@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import MarkdownEditor from "@/components/MarkdownEditor";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/contexts/ToastContext";
 import { authFetch } from "@/lib/auth-fetch";
 import { uploadThumbnailFromDevice } from "@/lib/supabase/storage";
 
@@ -22,6 +23,7 @@ function normalizeSlug(raw: string) {
 export default function NewPostPage() {
   const router = useRouter();
   const { loading, user } = useAuth();
+  const { toast } = useToast();
   const [slug, setSlug] = useState("");
   const [featuredImageUrl, setFeaturedImageUrl] = useState("");
   const [thumbnailUploading, setThumbnailUploading] = useState(false);
@@ -45,7 +47,7 @@ export default function NewPostPage() {
     const normalizedSlug = normalizeSlug(slug);
 
     if (!title || !normalizedSlug) {
-      alert("Please enter a title and slug");
+      toast({ variant: "error", title: "Missing fields", message: "Please enter a title and slug." });
       return;
     }
 
@@ -78,7 +80,11 @@ export default function NewPostPage() {
       router.push(`/admin/posts/${post.id}/edit`);
     } catch (err) {
       console.error("Error creating post:", err);
-      alert(err instanceof Error ? err.message : "Failed to create post");
+      toast({
+        variant: "error",
+        title: "Create failed",
+        message: err instanceof Error ? err.message : "Failed to create post",
+      });
     }
   };
 

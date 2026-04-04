@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import MarkdownEditor from "@/components/MarkdownEditor";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/contexts/ToastContext";
 import { authFetch } from "@/lib/auth-fetch";
 import { uploadThumbnailFromDevice } from "@/lib/supabase/storage";
 
@@ -27,6 +28,7 @@ export default function EditPostPage() {
   const params = useParams();
   const router = useRouter();
   const { loading: authLoading, user } = useAuth();
+  const { toast } = useToast();
   const [post, setPost] = useState<Post | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showVersions, setShowVersions] = useState(false);
@@ -70,7 +72,7 @@ export default function EditPostPage() {
         }
       } catch (err) {
         console.error("Error fetching post:", err);
-        alert("Failed to load post");
+        toast({ variant: "error", title: "Load failed", message: "Failed to load post." });
         router.push("/admin/posts");
       } finally {
         setIsLoading(false);
@@ -78,7 +80,7 @@ export default function EditPostPage() {
     };
 
     fetchPost();
-  }, [postId, authLoading, router]);
+  }, [postId, authLoading, router, toast]);
 
   const handleSave = async (title: string, content: string) => {
     try {
@@ -105,7 +107,7 @@ export default function EditPostPage() {
       }
     } catch (err) {
       console.error("Error saving post:", err);
-      alert("Failed to save post");
+      toast({ variant: "error", title: "Save failed", message: "Failed to save post." });
     }
   };
 
@@ -139,10 +141,10 @@ export default function EditPostPage() {
       if (!res.ok) throw new Error("Failed to publish post");
       const updated = await res.json();
       setPost(updated);
-      alert("Post published!");
+      toast({ variant: "success", title: "Published", message: "Post published!" });
     } catch (err) {
       console.error("Error publishing post:", err);
-      alert("Failed to publish post");
+      toast({ variant: "error", title: "Publish failed", message: "Failed to publish post." });
     }
   };
 
