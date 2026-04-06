@@ -118,7 +118,6 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
     recommendedPosts = [];
   }
 
-  const summary = post.excerpt || post.meta_description || post.content.substring(0, 220);
   const hasHeroImage = typeof post.featured_image_url === "string" && post.featured_image_url.trim().length > 0;
 
   const articleJsonLd = {
@@ -199,77 +198,87 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                   </time>
                 </p>
 
-                <p className="mt-6 text-base leading-7 text-slate-700 dark:text-slate-300">{summary}</p>
+                <article className="prose mt-8 max-w-none dark:prose-invert prose-a:no-underline">
+                  <ReactMarkdown
+                    components={
+                      {
+                        h1: ({ ...props }) => (
+                          <h1 className="mt-8 mb-4 text-3xl font-bold text-gray-900 dark:text-white" {...props} />
+                        ),
+                        h2: ({ ...props }) => (
+                          <h2 className="mt-6 mb-3 text-2xl font-bold text-gray-900 dark:text-white" {...props} />
+                        ),
+                        h3: ({ ...props }) => (
+                          <h3 className="mt-5 mb-2 text-xl font-bold text-gray-900 dark:text-white" {...props} />
+                        ),
+                        p: ({ ...props }) => (
+                          <p className="mb-4 leading-relaxed text-gray-700 dark:text-gray-300" {...props} />
+                        ),
+                        ul: ({ ...props }) => (
+                          <ul
+                            className="mb-4 list-inside list-disc space-y-2 text-gray-700 dark:text-gray-300"
+                            {...props}
+                          />
+                        ),
+                        ol: ({ ...props }) => (
+                          <ol
+                            className="mb-4 list-inside list-decimal space-y-2 text-gray-700 dark:text-gray-300"
+                            {...props}
+                          />
+                        ),
+                        li: ({ ...props }) => <li className="ml-2" {...props} />,
+                        blockquote: ({ ...props }) => (
+                          <blockquote
+                            className="my-4 border-l-4 border-blue-500 pl-4 italic text-gray-600 dark:text-gray-400"
+                            {...props}
+                          />
+                        ),
+                        img: ({ src, alt, ...props }: MarkdownImageProps) => {
+                          if (!src) return null;
+                          return (
+                            <img
+                              src={src}
+                              alt={alt || ""}
+                              loading="lazy"
+                              className="mx-auto my-6 max-h-[520px] w-auto max-w-full rounded-2xl border border-gray-200 object-contain shadow-sm dark:border-gray-800"
+                              {...props}
+                            />
+                          );
+                        },
+                        code: (props: MarkdownCodeProps) =>
+                          props.inline ? (
+                            <code
+                              className="rounded bg-gray-100 px-2 py-1 font-mono text-sm dark:bg-gray-800"
+                              {...props}
+                            />
+                          ) : (
+                            <code
+                              className="my-4 block overflow-auto rounded bg-gray-100 p-4 font-mono text-sm dark:bg-gray-800"
+                              {...props}
+                            />
+                          ),
+                        pre: ({ ...props }) => <pre className="mb-4" {...props} />,
+                        a: ({ children, href }) => {
+                          if (!href) {
+                            return <span className="text-blue-500">{children}</span>;
+                          }
+
+                          return (
+                            <FormLink href={href} className="text-blue-500 transition hover:text-blue-600">
+                              {children}
+                            </FormLink>
+                          );
+                        },
+                      } as const
+                    }
+                  >
+                    {post.content}
+                  </ReactMarkdown>
+                </article>
               </div>
             </header>
 
-            <div className="mt-10">
-              <article className="prose max-w-none dark:prose-invert prose-a:no-underline">
-                <ReactMarkdown
-                  components={{
-                    h1: ({ ...props }) => (
-                      <h1 className="mt-8 mb-4 text-3xl font-bold text-gray-900 dark:text-white" {...props} />
-                    ),
-                    h2: ({ ...props }) => (
-                      <h2 className="mt-6 mb-3 text-2xl font-bold text-gray-900 dark:text-white" {...props} />
-                    ),
-                    h3: ({ ...props }) => (
-                      <h3 className="mt-5 mb-2 text-xl font-bold text-gray-900 dark:text-white" {...props} />
-                    ),
-                    p: ({ ...props }) => <p className="mb-4 leading-relaxed text-gray-700 dark:text-gray-300" {...props} />,
-                    ul: ({ ...props }) => (
-                      <ul className="mb-4 list-inside list-disc space-y-2 text-gray-700 dark:text-gray-300" {...props} />
-                    ),
-                    ol: ({ ...props }) => (
-                      <ol className="mb-4 list-inside list-decimal space-y-2 text-gray-700 dark:text-gray-300" {...props} />
-                    ),
-                    li: ({ ...props }) => <li className="ml-2" {...props} />,
-                    blockquote: ({ ...props }) => (
-                      <blockquote
-                        className="my-4 border-l-4 border-blue-500 pl-4 italic text-gray-600 dark:text-gray-400"
-                        {...props}
-                      />
-                    ),
-                    img: ({ src, alt, ...props }: MarkdownImageProps) => {
-                      if (!src) return null;
-                      return (
-                        <img
-                          src={src}
-                          alt={alt || ""}
-                          loading="lazy"
-                          className="mx-auto my-6 max-h-[520px] w-auto max-w-full rounded-2xl border border-gray-200 object-contain shadow-sm dark:border-gray-800"
-                          {...props}
-                        />
-                      );
-                    },
-                    code: (props: MarkdownCodeProps) =>
-                      props.inline ? (
-                        <code className="rounded bg-gray-100 px-2 py-1 font-mono text-sm dark:bg-gray-800" {...props} />
-                      ) : (
-                        <code
-                          className="my-4 block overflow-auto rounded bg-gray-100 p-4 font-mono text-sm dark:bg-gray-800"
-                          {...props}
-                        />
-                      ),
-                    pre: ({ ...props }) => <pre className="mb-4" {...props} />,
-                    a: ({ children, href }) => {
-                      if (!href) {
-                        return <span className="text-blue-500">{children}</span>;
-                      }
-
-                      return (
-                        <FormLink href={href} className="text-blue-500 transition hover:text-blue-600">
-                          {children}
-                        </FormLink>
-                      );
-                    },
-                  }}
-                >
-                  {post.content}
-                </ReactMarkdown>
-              </article>
-
-              <div className="mt-12 space-y-6">
+            <div className="mt-12 space-y-6">
                 <PostEngagement postId={post.id} postTitle={post.title} postSlug={post.slug} siteUrl={siteUrl} />
 
                 <section className="rounded-[28px] border border-slate-200 bg-[#101826] p-6 text-white shadow-[0_18px_45px_rgba(15,23,42,0.14)]">
@@ -349,7 +358,6 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                     {"<-"} Back to blog
                   </FormLink>
                 </div>
-              </div>
             </div>
           </div>
 
