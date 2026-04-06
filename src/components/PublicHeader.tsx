@@ -47,7 +47,7 @@ export default function PublicHeader() {
   };
 
   return (
-    <header className="border-b border-slate-200 bg-white/95 backdrop-blur dark:border-gray-800 dark:bg-gray-950/95">
+    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur dark:border-gray-800 dark:bg-gray-950/95">
       <div className="mx-auto flex max-w-[92rem] items-center gap-6 px-4 py-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-3">
           <FormLink href="/" className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
