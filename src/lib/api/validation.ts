@@ -7,6 +7,7 @@ type ValidatedPostPayload = {
   excerpt: string;
   meta_description: string;
   featured_image_url: string | null;
+  is_featured: boolean;
 };
 
 type ValidatedPostUpdatePayload = Partial<ValidatedPostPayload>;
@@ -22,6 +23,11 @@ const SLUG_MAX = 120;
 const EXCERPT_MAX = 320;
 const META_DESCRIPTION_MAX = 320;
 const FEATURED_IMAGE_URL_MAX = 2048;
+
+function sanitizeBoolean(value: unknown, defaultValue = false): boolean {
+  if (typeof value === "boolean") return value;
+  return defaultValue;
+}
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -76,6 +82,7 @@ export function validateCreatePostPayload(input: unknown): ValidatedPostPayload 
   const excerpt = sanitizeText(input.excerpt);
   const meta_description = sanitizeText(input.meta_description);
   const featured_image_url = sanitizeFeaturedImageUrl(input.featured_image_url);
+  const is_featured = sanitizeBoolean(input.is_featured, false);
 
   if (!title) throw new Error("Title is required");
   if (!slug) throw new Error("Slug is required");
@@ -88,7 +95,7 @@ export function validateCreatePostPayload(input: unknown): ValidatedPostPayload 
     throw new Error(`Meta description must be <= ${META_DESCRIPTION_MAX} characters`);
   }
 
-  return { title, content, slug, excerpt, meta_description, featured_image_url };
+  return { title, content, slug, excerpt, meta_description, featured_image_url, is_featured };
 }
 
 export function validateUpdatePostPayload(input: unknown): ValidatedPostUpdatePayload {
@@ -103,6 +110,7 @@ export function validateUpdatePostPayload(input: unknown): ValidatedPostUpdatePa
     "excerpt",
     "meta_description",
     "featured_image_url",
+    "is_featured",
   ]);
   const incomingFields = Object.keys(input);
 
@@ -154,6 +162,10 @@ export function validateUpdatePostPayload(input: unknown): ValidatedPostUpdatePa
 
   if ("featured_image_url" in input) {
     updates.featured_image_url = sanitizeFeaturedImageUrl(input.featured_image_url);
+  }
+
+  if ("is_featured" in input) {
+    updates.is_featured = sanitizeBoolean(input.is_featured, false);
   }
 
   return updates;

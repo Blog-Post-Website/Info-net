@@ -41,6 +41,7 @@ export type Database = {
           excerpt: string | null;
           featured_image_url: string | null;
           meta_description: string | null;
+          is_featured: boolean;
           created_at: string;
           updated_at: string;
           published_at: string | null;
@@ -55,6 +56,7 @@ export type Database = {
           excerpt?: string | null;
           featured_image_url?: string | null;
           meta_description?: string | null;
+          is_featured?: boolean;
           created_at?: string;
           updated_at?: string;
           published_at?: string | null;
@@ -69,6 +71,7 @@ export type Database = {
           excerpt?: string | null;
           featured_image_url?: string | null;
           meta_description?: string | null;
+          is_featured?: boolean;
           created_at?: string;
           updated_at?: string;
           published_at?: string | null;

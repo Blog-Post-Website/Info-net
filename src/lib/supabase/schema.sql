@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS public.posts (
   excerpt TEXT,
   featured_image_url TEXT,
   meta_description TEXT,
+  is_featured BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
   published_at TIMESTAMP WITH TIME ZONE,

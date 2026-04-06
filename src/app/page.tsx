@@ -14,6 +14,7 @@ interface Post {
   content: string;
   published_at: string;
   featured_image_url?: string | null;
+  is_featured?: boolean | null;
 }
 
 type Story = {
@@ -28,6 +29,7 @@ type Story = {
   rank: number;
   imageUrl?: string | null;
   likeCount: number;
+  isFeatured: boolean;
 };
 
 const navLinks = [
@@ -37,7 +39,7 @@ const navLinks = [
   { label: "Contact", href: "/contact" },
 ];
 
-const demoStories: Omit<Story, "slug" | "live" | "rank" | "likeCount">[] = [
+const demoStories: Omit<Story, "slug" | "live" | "rank" | "likeCount" | "isFeatured">[] = [
   {
     id: "demo-1",
     title: "Why Edge AI Is Rewriting Frontend Performance in 2026",
@@ -223,6 +225,7 @@ export default function HomePage() {
         rank: index + 1,
         imageUrl: post.featured_image_url ?? null,
         likeCount: likeCounts[post.id] ?? 0,
+        isFeatured: !!post.is_featured,
       }))
     : demoStories.map((story, index) => ({
         ...story,
@@ -230,9 +233,13 @@ export default function HomePage() {
         live: false,
         rank: index + 1,
         likeCount: 0,
+        isFeatured: false,
       }));
 
-  const featuredStories = useMemo(() => stories.slice(0, 6), [stories]);
+  const featuredStories = useMemo(() => {
+    if (!hasLivePosts) return stories.slice(0, 6);
+    return stories.filter((story) => story.isFeatured).slice(0, 6);
+  }, [hasLivePosts, stories]);
   const topStories = useMemo(() => stories.slice(0, 4), [stories]);
   const trendingStories = useMemo(() => stories.slice(1, 7), [stories]);
   const latestStories = useMemo(() => stories.slice(4, 10), [stories]);
@@ -392,9 +399,6 @@ export default function HomePage() {
                       />
                     ) : null}
                     <div className="absolute inset-0 bg-black/15" />
-                    <div className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-700">
-                      {story.category}
-                    </div>
                   </div>
 
                   <div className="p-4">

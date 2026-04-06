@@ -16,6 +16,7 @@ interface Post {
   status: "draft" | "published" | "archived";
   published_at: string | null;
   featured_image_url?: string | null;
+  is_featured?: boolean | null;
 }
 
 type PostVersion = {
@@ -34,6 +35,7 @@ export default function EditPostPage() {
   const [showVersions, setShowVersions] = useState(false);
   const [versions, setVersions] = useState<PostVersion[]>([]);
   const [featuredImageUrl, setFeaturedImageUrl] = useState("");
+  const [isFeatured, setIsFeatured] = useState(false);
   const [thumbnailUploading, setThumbnailUploading] = useState(false);
   const [thumbnailUploadError, setThumbnailUploadError] = useState("");
 
@@ -63,6 +65,7 @@ export default function EditPostPage() {
         const data = await res.json();
         setPost(data);
         setFeaturedImageUrl(typeof data?.featured_image_url === "string" ? data.featured_image_url : "");
+        setIsFeatured(!!data?.is_featured);
 
         // Also fetch versions
         const versionsRes = await authFetch(`/api/posts/${postId}/versions`);
@@ -92,6 +95,7 @@ export default function EditPostPage() {
           content,
           slug: post?.slug,
           featured_image_url: featuredImageUrl.trim() || null,
+          is_featured: isFeatured,
         }),
       });
 
@@ -121,6 +125,7 @@ export default function EditPostPage() {
           content,
           slug: post?.slug,
           featured_image_url: featuredImageUrl.trim() || null,
+          is_featured: isFeatured,
         }),
       });
 
@@ -261,6 +266,22 @@ export default function EditPostPage() {
               <p className="mt-2 text-xs text-red-600">{thumbnailUploadError}</p>
             ) : null}
           </div>
+        </div>
+
+        {/* Featured toggle */}
+        <div className="mb-4">
+          <label className="flex items-center gap-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <input
+              type="checkbox"
+              checked={isFeatured}
+              onChange={(e) => setIsFeatured(e.target.checked)}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-gray-600"
+            />
+            Feature this post on homepage
+          </label>
+          <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+            When enabled, this post will appear in the Featured Article section.
+          </p>
         </div>
 
         {/* Editor */}

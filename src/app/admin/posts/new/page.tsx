@@ -26,6 +26,7 @@ export default function NewPostPage() {
   const { toast } = useToast();
   const [slug, setSlug] = useState("");
   const [featuredImageUrl, setFeaturedImageUrl] = useState("");
+  const [isFeatured, setIsFeatured] = useState(false);
   const [thumbnailUploading, setThumbnailUploading] = useState(false);
   const [thumbnailUploadError, setThumbnailUploadError] = useState("");
 
@@ -60,6 +61,7 @@ export default function NewPostPage() {
           content,
           slug: normalizedSlug,
           featured_image_url: featuredImageUrl.trim() || null,
+          is_featured: isFeatured,
         }),
       });
 
@@ -164,6 +166,22 @@ export default function NewPostPage() {
               <p className="mt-2 text-xs text-red-600">{thumbnailUploadError}</p>
             ) : null}
           </div>
+        </div>
+
+        {/* Featured toggle */}
+        <div className="mb-4">
+          <label className="flex items-center gap-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+            <input
+              type="checkbox"
+              checked={isFeatured}
+              onChange={(e) => setIsFeatured(e.target.checked)}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-gray-600"
+            />
+            Feature this post on homepage
+          </label>
+          <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+            When enabled, this post will appear in the Featured Article section.
+          </p>
         </div>
 
         {/* Editor */}
