@@ -58,6 +58,18 @@ function mapCreatePostError(error: unknown): { status: number; message: string }
   return null;
 }
 
+function isMissingIsFeaturedColumnError(error: unknown): boolean {
+  const pg = getPostgrestishError(error);
+  if (!pg) return false;
+
+  const msg = (pg.message ?? "").toLowerCase();
+  const details = (pg.details ?? "").toLowerCase();
+  const hint = (pg.hint ?? "").toLowerCase();
+  const combined = `${msg} ${details} ${hint}`;
+
+  return combined.includes("is_featured") && combined.includes("schema cache");
+}
+
 /**
  * POST /api/posts
  * Create a new draft post
@@ -94,27 +106,41 @@ export async function POST(req: NextRequest) {
     const { title, content, slug, excerpt, meta_description, featured_image_url, is_featured } =
       validateCreatePostPayload(payload);
 
+    const postInsert = {
+      user_id: user.id,
+      title,
+      content,
+      slug,
+      excerpt,
+      featured_image_url,
+      meta_description,
+      is_featured,
+      status: "draft" as const,
+    };
+
     const { data, error } = await supabase
       .from("posts")
-      .insert([
-        {
-          user_id: user.id,
-          title,
-          content,
-          slug,
-          excerpt,
-          featured_image_url,
-          meta_description,
-          is_featured,
-          status: "draft",
-        },
-      ])
+      .insert([postInsert])
       .select()
       .single();
 
-    if (error) throw error;
+    if (!error) {
+      return apiSuccess(ctx, data, 201);
+    }
 
-    return apiSuccess(ctx, data, 201);
+    if (isMissingIsFeaturedColumnError(error)) {
+      const { is_featured: _ignored, ...insertWithoutFeatured } = postInsert;
+      const fallback = await supabase
+        .from("posts")
+        .insert([insertWithoutFeatured])
+        .select()
+        .single();
+
+      if (fallback.error) throw fallback.error;
+      return apiSuccess(ctx, fallback.data, 201);
+    }
+
+    throw error;
   } catch (error) {
     logApiError(ctx, error);
     if (isValidationLikeError(error)) {

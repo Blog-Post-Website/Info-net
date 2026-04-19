@@ -6,6 +6,25 @@ import { buildRateLimitKey, checkRateLimit } from "@/lib/api/rate-limit";
 import { parseJsonBody, validateUpdatePostPayload } from "@/lib/api/validation";
 import { apiError, apiSuccess, createApiContext, isValidationLikeError, logApiError } from "@/lib/api/response";
 
+function getPostgrestishError(error: unknown): { message?: string; details?: string | null; hint?: string | null } | null {
+  if (!error || typeof error !== "object") return null;
+  const anyErr = error as Record<string, unknown>;
+  const message = typeof anyErr.message === "string" ? anyErr.message : undefined;
+  const details = typeof anyErr.details === "string" ? anyErr.details : null;
+  const hint = typeof anyErr.hint === "string" ? anyErr.hint : null;
+
+  if (!message && !details && !hint) return null;
+  return { message, details, hint };
+}
+
+function isMissingIsFeaturedColumnError(error: unknown): boolean {
+  const pg = getPostgrestishError(error);
+  if (!pg) return false;
+
+  const combined = `${(pg.message ?? "").toLowerCase()} ${(pg.details ?? "").toLowerCase()} ${(pg.hint ?? "").toLowerCase()}`;
+  return combined.includes("is_featured") && combined.includes("schema cache");
+}
+
 /**
  * GET /api/posts/[id]
  * Get single post (published or owned by user)
@@ -105,7 +124,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     ]);
 
     // Update post
-    const { data, error } = await supabase
+    const primaryUpdate = await supabase
       .from("posts")
       .update({
         ...updates,
@@ -115,9 +134,28 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       .select()
       .single();
 
-    if (error) throw error;
+    if (!primaryUpdate.error) {
+      return apiSuccess(ctx, primaryUpdate.data);
+    }
 
-    return apiSuccess(ctx, data);
+    if ("is_featured" in updates && isMissingIsFeaturedColumnError(primaryUpdate.error)) {
+      const { is_featured: _ignored, ...updatesWithoutFeatured } = updates;
+
+      const fallbackUpdate = await supabase
+        .from("posts")
+        .update({
+          ...updatesWithoutFeatured,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", postId)
+        .select()
+        .single();
+
+      if (fallbackUpdate.error) throw fallbackUpdate.error;
+      return apiSuccess(ctx, fallbackUpdate.data);
+    }
+
+    throw primaryUpdate.error;
   } catch (error) {
     logApiError(ctx, error);
     if (isValidationLikeError(error)) {
