@@ -14,6 +14,7 @@ export default function AdminLoginClient({ errorParam }: { errorParam?: string }
   const [loading, setLoading] = useState(false);
   const { signIn, adminEmail } = useAuth();
   const router = useRouter();
+  const normalizedAdminEmail = adminEmail.trim().toLowerCase();
 
   const handleAccessCheck = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,17 +25,17 @@ export default function AdminLoginClient({ errorParam }: { errorParam?: string }
       return;
     }
 
-    if (!adminEmail) {
+    if (!normalizedAdminEmail) {
       setError("Admin access is not configured.");
       return;
     }
 
-    if (accessEmail.trim().toLowerCase() !== adminEmail) {
+    if (accessEmail.trim().toLowerCase() !== normalizedAdminEmail) {
       setError("Access denied.");
       return;
     }
 
-    setEmail(adminEmail);
+    setEmail(normalizedAdminEmail);
     setAccessGranted(true);
   };
 
@@ -42,7 +43,7 @@ export default function AdminLoginClient({ errorParam }: { errorParam?: string }
     e.preventDefault();
     setError("");
 
-    if (email.toLowerCase() !== adminEmail) {
+    if (email.trim().toLowerCase() !== normalizedAdminEmail) {
       setError("Only the configured admin account can sign in.");
       return;
     }

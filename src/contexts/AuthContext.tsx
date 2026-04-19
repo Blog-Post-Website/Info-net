@@ -16,10 +16,31 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+function mapAuthError(error: unknown): Error {
+  if (error instanceof Error) {
+    const message = error.message || "";
+    const normalized = message.toLowerCase();
+
+    if (
+      normalized.includes("failed to fetch") ||
+      normalized.includes("networkerror") ||
+      normalized.includes("load failed")
+    ) {
+      return new Error(
+        "Cannot reach the authentication server. Check your internet/DNS/firewall settings and try again."
+      );
+    }
+
+    return error;
+  }
+
+  return new Error("Authentication failed");
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const adminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL ?? "").toLowerCase();
+  const adminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL ?? "").trim().toLowerCase();
   const isAdmin = !!user?.email && user.email.toLowerCase() === adminEmail;
 
   useEffect(() => {
@@ -82,13 +103,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({ email, password });
-    if (error) throw error;
+    try {
+      const { error } = await supabase.auth.signUp({ email, password });
+      if (error) throw error;
+    } catch (error) {
+      throw mapAuthError(error);
+    }
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+    } catch (error) {
+      throw mapAuthError(error);
+    }
   };
 
   const signOut = async () => {
