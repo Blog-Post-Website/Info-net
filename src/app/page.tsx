@@ -39,82 +39,6 @@ const navLinks = [
   { label: "Contact", href: "/contact" },
 ];
 
-const demoStories: Omit<Story, "slug" | "live" | "rank" | "likeCount" | "isFeatured">[] = [
-  {
-    id: "demo-1",
-    title: "Why Edge AI Is Rewriting Frontend Performance in 2026",
-    excerpt:
-      "From on-device embeddings to latency budgets, this guide breaks down how teams ship AI features without tanking Core Web Vitals.",
-    category: "AI Engineering",
-    readTime: "7 min read",
-    date: "Apr 03, 2026",
-    imageUrl: null,
-  },
-  {
-    id: "demo-2",
-    title: "TypeScript 6 + React 20 Patterns That Actually Reduced Bugs",
-    excerpt: "A production-focused playbook: stricter domain types, server boundaries, and event contracts that survived scale.",
-    category: "Frontend",
-    readTime: "9 min read",
-    date: "Apr 02, 2026",
-    imageUrl: null,
-  },
-  {
-    id: "demo-3",
-    title: "Serverless Security Checklist: 12 Mistakes We Found in Real Audits",
-    excerpt: "Token leakage traps, SSR trust boundaries, and monitoring gaps teams still miss.",
-    category: "Cloud Security",
-    readTime: "11 min read",
-    date: "Apr 01, 2026",
-    imageUrl: null,
-  },
-  {
-    id: "demo-4",
-    title: "Postgres at Scale: Practical Index Strategies for Content Platforms",
-    excerpt: "Index design patterns for posts, tags, and timelines with benchmark-backed tradeoffs.",
-    category: "Data",
-    readTime: "8 min read",
-    date: "Mar 31, 2026",
-    imageUrl: null,
-  },
-  {
-    id: "demo-5",
-    title: "Cybersecurity Teams Shift to Continuous Threat Modeling",
-    excerpt: "How modern teams combine runtime signals with architecture maps to close risk faster.",
-    category: "Security",
-    readTime: "6 min read",
-    date: "Mar 31, 2026",
-    imageUrl: null,
-  },
-  {
-    id: "demo-6",
-    title: "The New Rule of Developer Productivity: Measure Cognitive Load",
-    excerpt: "Engineering orgs are redesigning workflows around focus time and clarity metrics.",
-    category: "Leadership",
-    readTime: "5 min read",
-    date: "Mar 30, 2026",
-    imageUrl: null,
-  },
-  {
-    id: "demo-7",
-    title: "The Next Wave of Open Source Infrastructure Is Smaller and Sharper",
-    excerpt: "A look at how lean maintainers are reshaping the ecosystem with opinionated toolchains.",
-    category: "Open Source",
-    readTime: "6 min read",
-    date: "Mar 29, 2026",
-    imageUrl: null,
-  },
-  {
-    id: "demo-8",
-    title: "Design Systems Are Becoming Content Systems",
-    excerpt: "Editorial teams now want components that can carry both brand and publishing logic.",
-    category: "Design",
-    readTime: "4 min read",
-    date: "Mar 28, 2026",
-    imageUrl: null,
-  },
-];
-
 const featuredTiles = [
   "bg-[linear-gradient(135deg,#0f172a_0%,#1d4ed8_55%,#38bdf8_100%)]",
   "bg-[linear-gradient(135deg,#7c3aed_0%,#c4b5fd_100%)]",
@@ -227,14 +151,7 @@ export default function HomePage() {
         likeCount: likeCounts[post.id] ?? 0,
         isFeatured: !!post.is_featured,
       }))
-    : demoStories.map((story, index) => ({
-        ...story,
-        slug: "",
-        live: false,
-        rank: index + 1,
-        likeCount: 0,
-        isFeatured: false,
-      }));
+    : [];
 
   const featuredStories = useMemo(() => {
     if (!hasLivePosts) return stories.slice(0, 6);
@@ -244,6 +161,7 @@ export default function HomePage() {
   const topStories = useMemo(() => stories.slice(0, 4), [stories]);
   const trendingStories = useMemo(() => stories.slice(1, 7), [stories]);
   const latestStories = useMemo(() => stories.slice(4, 10), [stories]);
+  const isWaitingForPosts = postsLoading && !hasLivePosts;
 
   const filteredLatest = searchQuery
     ? latestStories.filter((story) => {
@@ -375,7 +293,26 @@ export default function HomePage() {
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {featuredStories.map((story, index) => (
+              {isWaitingForPosts ? (
+                <>
+                  {Array.from({ length: 6 }).map((_, index) => (
+                    <article
+                      key={`featured-loading-${index}`}
+                      className="overflow-hidden rounded-xl border border-slate-200 bg-white animate-pulse"
+                      aria-hidden="true"
+                    >
+                      <div className="h-40 bg-slate-200" />
+                      <div className="space-y-3 p-4">
+                        <div className="h-3 w-3/4 rounded bg-slate-200" />
+                        <div className="h-7 w-full rounded bg-slate-200" />
+                        <div className="h-3 w-full rounded bg-slate-200" />
+                        <div className="h-3 w-5/6 rounded bg-slate-200" />
+                      </div>
+                    </article>
+                  ))}
+                </>
+              ) : featuredStories.length > 0 ? (
+                featuredStories.map((story, index) => (
                 <article
                   key={story.id}
                   className={`overflow-hidden rounded-xl border border-slate-200 bg-white ${story.live ? "cursor-pointer" : "cursor-default"}`}
@@ -443,8 +380,21 @@ export default function HomePage() {
                     </div>
                   </div>
                 </article>
-              ))}
+                ))
+              ) : (
+                <div className="sm:col-span-2 lg:col-span-3 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+                  <p className="text-base font-semibold text-slate-700">No featured stories yet</p>
+                  <p className="mt-2 text-sm text-slate-500">Publish posts or mark posts as featured from the admin panel.</p>
+                </div>
+              )}
             </div>
+
+            {isWaitingForPosts && (
+              <div className="mt-4 flex items-center gap-3 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+                <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-blue-200 border-t-blue-600" />
+                Loading latest posts from the server. Please wait a moment.
+              </div>
+            )}
           </div>
 
           <aside className="rounded-xl border border-slate-200 bg-white p-5 shadow-[0_18px_45px_rgba(15,23,42,0.08)] sm:p-6">
@@ -453,7 +403,21 @@ export default function HomePage() {
               <span className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Now</span>
             </div>
             <div className="divide-y divide-slate-100">
-              {topStories.map((story, index) => (
+              {isWaitingForPosts ? (
+                Array.from({ length: 4 }).map((_, index) => (
+                  <article key={`top-loading-${index}`} className="animate-pulse py-4 first:pt-0 last:pb-0" aria-hidden="true">
+                    <div className="grid grid-cols-[1fr_72px] items-start gap-4">
+                      <div className="space-y-2">
+                        <div className="h-4 w-11/12 rounded bg-slate-200" />
+                        <div className="h-4 w-8/12 rounded bg-slate-200" />
+                        <div className="h-3 w-5/12 rounded bg-slate-200" />
+                      </div>
+                      <div className="h-16 w-16 rounded-xl bg-slate-200" />
+                    </div>
+                  </article>
+                ))
+              ) : (
+                topStories.map((story, index) => (
                 <article
                   key={story.id}
                   className={`py-4 first:pt-0 last:pb-0 ${story.live ? "cursor-pointer" : "cursor-default"}`}
@@ -495,7 +459,8 @@ export default function HomePage() {
                     )}
                   </div>
                 </article>
-              ))}
+                ))
+              )}
             </div>
           </aside>
         </section>
@@ -513,7 +478,23 @@ export default function HomePage() {
             </div>
 
             <div className="space-y-4">
-              {(searchQuery ? filteredLatest : latestStories).map((story, index) => (
+              {isWaitingForPosts ? (
+                Array.from({ length: 3 }).map((_, index) => (
+                  <article
+                    key={`latest-loading-${index}`}
+                    className="grid gap-4 border-b border-slate-100 pb-4 last:border-0 last:pb-0 sm:grid-cols-[140px_1fr] animate-pulse"
+                    aria-hidden="true"
+                  >
+                    <div className="h-24 rounded-2xl bg-slate-200" />
+                    <div className="space-y-3">
+                      <div className="h-6 w-10/12 rounded bg-slate-200" />
+                      <div className="h-4 w-full rounded bg-slate-200" />
+                      <div className="h-4 w-9/12 rounded bg-slate-200" />
+                    </div>
+                  </article>
+                ))
+              ) : (
+                (searchQuery ? filteredLatest : latestStories).map((story, index) => (
                 <article
                   key={story.id}
                   className={`grid gap-4 border-b border-slate-100 pb-4 last:border-0 last:pb-0 sm:grid-cols-[140px_1fr] ${story.live ? "cursor-pointer" : "cursor-default"}`}
@@ -554,7 +535,8 @@ export default function HomePage() {
                     </p>
                   </div>
                 </article>
-              ))}
+                ))
+              )}
             </div>
           </div>
 
@@ -584,21 +566,31 @@ export default function HomePage() {
                 </span>
               </div>
               <div className="space-y-3">
-                {stories.slice(0, 3).map((story) => (
+                {isWaitingForPosts ? (
+                  Array.from({ length: 3 }).map((_, index) => (
+                    <article key={`editor-loading-${index}`} className="rounded-2xl border border-slate-200 p-4 animate-pulse" aria-hidden="true">
+                      <div className="h-3 w-1/4 rounded bg-slate-200" />
+                      <div className="mt-3 h-6 w-11/12 rounded bg-slate-200" />
+                      <div className="mt-3 h-3 w-6/12 rounded bg-slate-200" />
+                    </article>
+                  ))
+                ) : (
+                  stories.slice(0, 3).map((story) => (
                   <article key={story.id} className="rounded-2xl border border-slate-200 p-4 transition hover:bg-slate-50">
                     <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{story.category}</p>
                     <div className="mt-2 text-lg font-bold leading-snug">{renderStoryLink(story, "transition hover:text-blue-600")}</div>
                     <p className="mt-2 text-sm text-slate-600">{story.date} • {story.readTime}</p>
                   </article>
-                ))}
+                  ))
+                )}
               </div>
             </section>
           </div>
         </section>
 
         {!hasLivePosts && !postsLoading && (
-          <div className="mt-8 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            Demo content is visible right now. Publish posts from the admin dashboard to replace it with real stories.
+          <div className="mt-8 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+            No published posts found yet. Publish from the admin dashboard and refresh to display real stories.
           </div>
         )}
 
