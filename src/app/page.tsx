@@ -238,7 +238,8 @@ export default function HomePage() {
 
   const featuredStories = useMemo(() => {
     if (!hasLivePosts) return stories.slice(0, 6);
-    return stories.filter((story) => story.isFeatured).slice(0, 6);
+    const featured = stories.filter((story) => story.isFeatured);
+    return (featured.length > 0 ? featured : stories).slice(0, 6);
   }, [hasLivePosts, stories]);
   const topStories = useMemo(() => stories.slice(0, 4), [stories]);
   const trendingStories = useMemo(() => stories.slice(1, 7), [stories]);
