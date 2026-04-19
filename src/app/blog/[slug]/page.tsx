@@ -148,20 +148,25 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
   const { lead: leadContent, rest: remainingContent } = splitContentForHero(post.content);
 
   const markdownComponents = {
-    h1: ({ ...props }) => <h1 className="mt-8 mb-4 text-3xl font-bold text-gray-900 dark:text-white" {...props} />,
-    h2: ({ ...props }) => <h2 className="mt-6 mb-3 text-2xl font-bold text-gray-900 dark:text-white" {...props} />,
-    h3: ({ ...props }) => <h3 className="mt-5 mb-2 text-xl font-bold text-gray-900 dark:text-white" {...props} />,
-    p: ({ ...props }) => <p className="mb-4 leading-relaxed text-gray-700 dark:text-gray-300" {...props} />,
+    h1: ({ ...props }) => <h1 className="mt-10 mb-5 text-3xl font-bold leading-tight text-gray-900 dark:text-white" {...props} />,
+    h2: ({ ...props }) => (
+      <h2
+        className="mt-12 mb-4 border-t border-slate-200 pt-6 text-2xl font-bold leading-tight text-gray-900 dark:border-gray-800 dark:text-white"
+        {...props}
+      />
+    ),
+    h3: ({ ...props }) => <h3 className="mt-8 mb-3 text-xl font-bold leading-snug text-gray-900 dark:text-white" {...props} />,
+    p: ({ ...props }) => <p className="mb-5 text-[1.06rem] leading-8 text-gray-700 dark:text-gray-300" {...props} />,
     ul: ({ ...props }) => (
-      <ul className="mb-4 list-inside list-disc space-y-2 text-gray-700 dark:text-gray-300" {...props} />
+      <ul className="mb-6 list-outside list-disc space-y-2 pl-6 text-[1.03rem] text-gray-700 marker:text-blue-500 dark:text-gray-300" {...props} />
     ),
     ol: ({ ...props }) => (
-      <ol className="mb-4 list-inside list-decimal space-y-2 text-gray-700 dark:text-gray-300" {...props} />
+      <ol className="mb-6 list-outside list-decimal space-y-2 pl-6 text-[1.03rem] text-gray-700 marker:font-semibold marker:text-blue-500 dark:text-gray-300" {...props} />
     ),
-    li: ({ ...props }) => <li className="ml-2" {...props} />,
+    li: ({ ...props }) => <li className="pl-1 leading-8" {...props} />,
     blockquote: ({ ...props }) => (
       <blockquote
-        className="my-4 border-l-4 border-blue-500 pl-4 italic text-gray-600 dark:text-gray-400"
+        className="my-8 rounded-r-2xl border-l-4 border-blue-500 bg-blue-50/70 px-5 py-4 text-[1.03rem] italic leading-8 text-gray-700 dark:bg-blue-950/30 dark:text-gray-300"
         {...props}
       />
     ),
@@ -179,18 +184,20 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
     },
     code: (props: MarkdownCodeProps) =>
       props.inline ? (
-        <code className="rounded bg-gray-100 px-2 py-1 font-mono text-sm dark:bg-gray-800" {...props} />
+        <code className="rounded-md bg-slate-100 px-2 py-1 font-mono text-[0.92rem] text-slate-800 dark:bg-slate-800 dark:text-slate-100" {...props} />
       ) : (
-        <code className="my-4 block overflow-auto rounded bg-gray-100 p-4 font-mono text-sm dark:bg-gray-800" {...props} />
+        <code className="my-5 block overflow-x-auto rounded-xl bg-slate-100 p-4 font-mono text-[0.92rem] leading-7 text-slate-800 dark:bg-slate-800 dark:text-slate-100" {...props} />
       ),
-    pre: ({ ...props }) => <pre className="mb-4" {...props} />,
+    pre: ({ ...props }) => <pre className="mb-6 mt-2 overflow-x-auto" {...props} />,
+    hr: ({ ...props }) => <hr className="my-10 border-slate-200 dark:border-gray-800" {...props} />,
+    strong: ({ ...props }) => <strong className="font-semibold text-slate-900 dark:text-white" {...props} />,
     a: ({ children, href }: { children?: React.ReactNode; href?: string }) => {
       if (!href) {
         return <span className="text-blue-500">{children}</span>;
       }
 
       return (
-        <FormLink href={href} className="text-blue-500 transition hover:text-blue-600">
+        <FormLink href={href} className="font-medium text-blue-600 underline decoration-blue-300 underline-offset-4 transition hover:text-blue-700">
           {children}
         </FormLink>
       );
