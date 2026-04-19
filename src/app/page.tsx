@@ -577,7 +577,7 @@ export default function HomePage() {
                 ) : (
                   stories.slice(0, 3).map((story) => (
                   <article key={story.id} className="rounded-2xl border border-slate-200 p-4 transition hover:bg-slate-50">
-                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">{story.category}</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Editor Pick</p>
                     <div className="mt-2 text-lg font-bold leading-snug">{renderStoryLink(story, "transition hover:text-blue-600")}</div>
                     <p className="mt-2 text-sm text-slate-600">{story.date} • {story.readTime}</p>
                   </article>
