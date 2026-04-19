@@ -119,7 +119,6 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
   }
 
   const hasHeroImage = typeof post.featured_image_url === "string" && post.featured_image_url.trim().length > 0;
-  const postSummary = post.meta_description || post.excerpt || post.content.substring(0, 240);
 
   const articleJsonLd = {
     "@context": "https://schema.org",
@@ -199,14 +198,6 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                   </time>
                 </p>
 
-                <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-5 dark:border-gray-800 dark:bg-gray-900/60">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
-                    Description
-                  </p>
-                  <p className="mt-3 text-base leading-7 text-slate-700 dark:text-slate-300">
-                    {postSummary}
-                  </p>
-                </div>
               </div>
             </header>
 
