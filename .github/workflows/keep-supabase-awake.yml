@@ -10,28 +10,51 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Ping public posts endpoint
+      - name: Ping keep-alive endpoints
         env:
           SITE_URL: ${{ vars.SITE_URL }}
         run: |
           BASE_URL="${SITE_URL:-https://infonet-flax.vercel.app}"
-          TARGET_URL="${BASE_URL%/}/api/public/posts?limit=1"
+          API_TARGET_URL="${BASE_URL%/}/api/public/posts?limit=1"
+          HOME_TARGET_URL="${BASE_URL%/}/"
 
-          echo "Pinging: $TARGET_URL"
+          ping_target() {
+            local url="$1"
+            local output_file="$2"
+            local status_code
 
-          for attempt in 1 2 3; do
-            status_code=$(curl -sS -o response.json -w "%{http_code}" "$TARGET_URL" || true)
-            echo "Attempt $attempt status: $status_code"
+            status_code=$(curl -sS -o "$output_file" -w "%{http_code}" "$url" || true)
+            echo "Status for $url => $status_code"
 
             if [ "$status_code" = "200" ]; then
-              echo "Keep-alive ping succeeded."
+              return 0
+            fi
+
+            return 1
+          }
+
+          echo "Primary target: $API_TARGET_URL"
+          echo "Fallback target: $HOME_TARGET_URL"
+
+          for attempt in 1 2 3; do
+            echo "Attempt $attempt"
+
+            if ping_target "$API_TARGET_URL" "response-api.json"; then
+              echo "Keep-alive succeeded using API endpoint."
+              exit 0
+            fi
+
+            if ping_target "$HOME_TARGET_URL" "response-home.json"; then
+              echo "Keep-alive succeeded using homepage fallback endpoint."
               exit 0
             fi
 
             sleep 20
           done
 
-          echo "Keep-alive ping failed after retries."
-          echo "Response body:"
-          cat response.json || true
+          echo "Keep-alive failed after retries for both endpoints."
+          echo "API endpoint response:"
+          cat response-api.json || true
+          echo "Homepage response:"
+          cat response-home.json || true
           exit 1

@@ -34,6 +34,7 @@ This repo now includes a free keep-alive workflow:
 
 - Workflow file: `.github/workflows/keep-supabase-awake.yml`
 - It pings `/api/public/posts?limit=1` every 12 hours.
+- If that endpoint is temporarily unavailable, it falls back to `/`.
 - It can also run manually from GitHub Actions (`workflow_dispatch`).
 
 Optional (recommended):
