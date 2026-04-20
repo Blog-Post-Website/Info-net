@@ -35,18 +35,10 @@ function splitContentForHero(content: string): { lead: string; rest: string } {
     return { lead: content, rest: "" };
   }
 
-  const leadBlocks: string[] = [];
-  let charCount = 0;
-
-  for (const block of blocks) {
-    if (leadBlocks.length >= 2) break;
-    leadBlocks.push(block);
-    charCount += block.length;
-    if (charCount >= 420) break;
-  }
-
-  const lead = leadBlocks.join("\n\n");
-  const rest = blocks.slice(leadBlocks.length).join("\n\n");
+  // Keep the hero-side intro intentionally short to avoid a tall first row that leaves
+  // a large blank area under the image before the main content continues below.
+  const lead = blocks[0];
+  const rest = blocks.slice(1).join("\n\n");
 
   return { lead, rest };
 }
