@@ -364,7 +364,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                           />
                         )}
                         <div>
-                          <p className="line-clamp-3 text-[1.35rem] font-bold leading-snug text-slate-900 underline underline-offset-2 transition hover:text-blue-600 dark:text-white sm:text-[1.45rem]">
+                          <p className="line-clamp-3 text-[1.05rem] font-bold leading-snug text-slate-900 underline underline-offset-2 transition hover:text-blue-600 dark:text-white sm:text-[1.15rem]">
                             {item.title}
                           </p>
                           <p className="mt-2 inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.06em] text-slate-700 dark:text-slate-300">
@@ -421,7 +421,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                           />
                         )}
                         <div>
-                          <p className="line-clamp-3 text-[1.35rem] font-bold leading-snug text-slate-900 underline underline-offset-2 transition hover:text-blue-600 dark:text-white sm:text-[1.45rem]">
+                          <p className="line-clamp-3 text-[1.05rem] font-bold leading-snug text-slate-900 underline underline-offset-2 transition hover:text-blue-600 dark:text-white sm:text-[1.15rem]">
                             {item.title}
                           </p>
                           <p className="mt-2 inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.06em] text-slate-700 dark:text-slate-300">
@@ -478,7 +478,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                           />
                         )}
                         <div>
-                          <p className="line-clamp-3 text-[1.35rem] font-bold leading-snug text-slate-900 underline underline-offset-2 transition hover:text-blue-600 dark:text-white sm:text-[1.45rem]">
+                          <p className="line-clamp-3 text-[1.05rem] font-bold leading-snug text-slate-900 underline underline-offset-2 transition hover:text-blue-600 dark:text-white sm:text-[1.15rem]">
                             {item.title}
                           </p>
                           <p className="mt-2 inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.06em] text-slate-700 dark:text-slate-300">
