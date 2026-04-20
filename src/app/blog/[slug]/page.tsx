@@ -362,11 +362,6 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                   </div>
                 </section>
 
-                <div className="border-t border-gray-200 pt-6 dark:border-gray-700">
-                  <FormLink href="/blog" className="font-medium text-blue-500 transition-colors hover:text-blue-600">
-                    {"<-"} Back to blog
-                  </FormLink>
-                </div>
             </div>
           </div>
 
