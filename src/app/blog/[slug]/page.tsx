@@ -293,7 +293,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                             className="grid w-full cursor-pointer grid-cols-[1fr_72px] items-start gap-4 text-left"
                           >
                             <div>
-                              <p className="line-clamp-2 text-lg font-bold leading-snug text-slate-900 transition hover:text-blue-600 dark:text-white">
+                              <p className="line-clamp-2 text-base font-bold leading-snug text-slate-900 transition hover:text-blue-600 dark:text-white sm:text-[1.05rem]">
                                 {item.title}
                               </p>
                               <p className="mt-2 text-xs font-medium text-slate-500 dark:text-slate-400">
@@ -351,7 +351,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                         className="grid w-full cursor-pointer grid-cols-[1fr_72px] items-start gap-4 text-left"
                       >
                         <div>
-                          <p className="line-clamp-2 text-lg font-bold leading-snug text-slate-900 transition hover:text-blue-600 dark:text-white">
+                          <p className="line-clamp-2 text-base font-bold leading-snug text-slate-900 transition hover:text-blue-600 dark:text-white sm:text-[1.05rem]">
                             {item.title}
                           </p>
                           <p className="mt-2 text-xs font-medium text-slate-500 dark:text-slate-400">
@@ -402,7 +402,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                         className="grid w-full cursor-pointer grid-cols-[1fr_72px] items-start gap-4 text-left"
                       >
                         <div>
-                          <p className="line-clamp-2 text-lg font-bold leading-snug text-slate-900 transition hover:text-blue-600 dark:text-white">
+                          <p className="line-clamp-2 text-base font-bold leading-snug text-slate-900 transition hover:text-blue-600 dark:text-white sm:text-[1.05rem]">
                             {item.title}
                           </p>
                           <p className="mt-2 text-xs font-medium text-slate-500 dark:text-slate-400">
@@ -453,7 +453,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                         className="grid w-full cursor-pointer grid-cols-[1fr_72px] items-start gap-4 text-left"
                       >
                         <div>
-                          <p className="line-clamp-2 text-lg font-bold leading-snug text-slate-900 transition hover:text-blue-600 dark:text-white">
+                          <p className="line-clamp-2 text-base font-bold leading-snug text-slate-900 transition hover:text-blue-600 dark:text-white sm:text-[1.05rem]">
                             {item.title}
                           </p>
                           <p className="mt-2 text-xs font-medium text-slate-500 dark:text-slate-400">
