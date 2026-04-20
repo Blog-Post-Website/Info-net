@@ -122,24 +122,19 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
 
   const markdownComponents = {
     h1: ({ ...props }) => <h1 className="mt-10 mb-5 text-3xl font-bold leading-tight text-gray-900 dark:text-white" {...props} />,
-    h2: ({ ...props }) => (
-      <h2
-        className="mt-12 mb-4 border-t border-slate-200 pt-6 text-2xl font-bold leading-tight text-gray-900 dark:border-gray-800 dark:text-white"
-        {...props}
-      />
-    ),
+    h2: ({ ...props }) => <h2 className="mt-10 mb-4 text-2xl font-bold leading-tight text-gray-900 dark:text-white" {...props} />,
     h3: ({ ...props }) => <h3 className="mt-8 mb-3 text-xl font-bold leading-snug text-gray-900 dark:text-white" {...props} />,
     p: ({ ...props }) => <p className="mb-5 text-[1.06rem] leading-8 text-gray-700 dark:text-gray-300" {...props} />,
     ul: ({ ...props }) => (
-      <ul className="mb-6 list-outside list-disc space-y-2 pl-6 text-[1.03rem] text-gray-700 marker:text-blue-500 dark:text-gray-300" {...props} />
+      <ul className="mb-6 list-outside list-disc space-y-2 pl-6 text-[1.03rem] text-gray-700 dark:text-gray-300" {...props} />
     ),
     ol: ({ ...props }) => (
-      <ol className="mb-6 list-outside list-decimal space-y-2 pl-6 text-[1.03rem] text-gray-700 marker:font-semibold marker:text-blue-500 dark:text-gray-300" {...props} />
+      <ol className="mb-6 list-outside list-decimal space-y-2 pl-6 text-[1.03rem] text-gray-700 dark:text-gray-300" {...props} />
     ),
     li: ({ ...props }) => <li className="pl-1 leading-8" {...props} />,
     blockquote: ({ ...props }) => (
       <blockquote
-        className="my-8 rounded-r-2xl border-l-4 border-blue-500 bg-blue-50/70 px-5 py-4 text-[1.03rem] italic leading-8 text-gray-700 dark:bg-blue-950/30 dark:text-gray-300"
+        className="my-8 border-l-0 px-0 text-[1.03rem] italic leading-8 text-gray-700 dark:text-gray-300"
         {...props}
       />
     ),
@@ -337,21 +332,21 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
             </div>
           </div>
 
-          <aside className="space-y-6">
-            <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-[0_18px_45px_rgba(15,23,42,0.08)] dark:border-gray-800 dark:bg-gray-950 sm:p-6">
+          <aside className="space-y-8">
+            <section className="p-0 sm:p-0">
               <div className="mb-5 flex items-center justify-between">
                 <h3 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Related Post</h3>
               </div>
-              <div className="divide-y divide-slate-100 dark:divide-gray-800">
+              <div className="divide-y divide-slate-200 dark:divide-gray-800">
                 {relatedPosts.length > 0 ? (
                   relatedPosts.map((item, index) => (
                     <article key={item.id} className="py-4 first:pt-0 last:pb-0">
                       <FormLink
                         href={`/blog/${item.slug}`}
-                        className="grid w-full cursor-pointer grid-cols-[1fr_72px] items-start gap-4 text-left"
+                        className="grid w-full cursor-pointer grid-cols-[1fr_88px] items-start gap-4 text-left"
                       >
                         <div>
-                          <p className="line-clamp-2 text-base font-bold leading-snug text-slate-900 transition hover:text-blue-600 dark:text-white sm:text-[1.05rem]">
+                          <p className="line-clamp-3 text-[1.35rem] font-bold leading-snug text-slate-900 underline underline-offset-2 transition hover:text-blue-600 dark:text-white sm:text-[1.45rem]">
                             {item.title}
                           </p>
                           <p className="mt-2 text-xs font-medium text-slate-500 dark:text-slate-400">
@@ -366,12 +361,12 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                           <img
                             src={item.featured_image_url}
                             alt=""
-                            className="h-16 w-16 rounded-xl object-cover"
+                            className="h-20 w-[88px] rounded-md object-cover"
                             loading="lazy"
                           />
                         ) : (
                           <div
-                            className={`h-16 w-16 rounded-xl ${
+                            className={`h-20 w-[88px] rounded-md ${
                               index % 3 === 0
                                 ? "bg-[linear-gradient(120deg,#0369a1_0%,#22d3ee_100%)]"
                                 : index % 3 === 1
@@ -389,20 +384,20 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
               </div>
             </section>
 
-            <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-[0_18px_45px_rgba(15,23,42,0.08)] dark:border-gray-800 dark:bg-gray-950 sm:p-6">
+            <section className="p-0 sm:p-0">
               <div className="mb-5 flex items-center justify-between">
                 <h3 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Top Stories</h3>
               </div>
-              <div className="divide-y divide-slate-100 dark:divide-gray-800">
+              <div className="divide-y divide-slate-200 dark:divide-gray-800">
                 {topStories.length > 0 ? (
                   topStories.map((item, index) => (
                     <article key={item.id} className="py-4 first:pt-0 last:pb-0">
                       <FormLink
                         href={`/blog/${item.slug}`}
-                        className="grid w-full cursor-pointer grid-cols-[1fr_72px] items-start gap-4 text-left"
+                        className="grid w-full cursor-pointer grid-cols-[1fr_88px] items-start gap-4 text-left"
                       >
                         <div>
-                          <p className="line-clamp-2 text-base font-bold leading-snug text-slate-900 transition hover:text-blue-600 dark:text-white sm:text-[1.05rem]">
+                          <p className="line-clamp-3 text-[1.35rem] font-bold leading-snug text-slate-900 underline underline-offset-2 transition hover:text-blue-600 dark:text-white sm:text-[1.45rem]">
                             {item.title}
                           </p>
                           <p className="mt-2 text-xs font-medium text-slate-500 dark:text-slate-400">
@@ -417,12 +412,12 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                           <img
                             src={item.featured_image_url}
                             alt=""
-                            className="h-16 w-16 rounded-xl object-cover"
+                            className="h-20 w-[88px] rounded-md object-cover"
                             loading="lazy"
                           />
                         ) : (
                           <div
-                            className={`h-16 w-16 rounded-xl ${
+                            className={`h-20 w-[88px] rounded-md ${
                               index % 3 === 0
                                 ? "bg-[linear-gradient(120deg,#0369a1_0%,#22d3ee_100%)]"
                                 : index % 3 === 1
@@ -440,20 +435,20 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
               </div>
             </section>
 
-            <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-[0_18px_45px_rgba(15,23,42,0.08)] dark:border-gray-800 dark:bg-gray-950 sm:p-6">
+            <section className="p-0 sm:p-0">
               <div className="mb-5 flex items-center justify-between">
                 <h3 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Category</h3>
               </div>
-              <div className="divide-y divide-slate-100 dark:divide-gray-800">
+              <div className="divide-y divide-slate-200 dark:divide-gray-800">
                 {categoryPosts.length > 0 ? (
                   categoryPosts.map((item, index) => (
                     <article key={item.id} className="py-4 first:pt-0 last:pb-0">
                       <FormLink
                         href={`/blog/${item.slug}`}
-                        className="grid w-full cursor-pointer grid-cols-[1fr_72px] items-start gap-4 text-left"
+                        className="grid w-full cursor-pointer grid-cols-[1fr_88px] items-start gap-4 text-left"
                       >
                         <div>
-                          <p className="line-clamp-2 text-base font-bold leading-snug text-slate-900 transition hover:text-blue-600 dark:text-white sm:text-[1.05rem]">
+                          <p className="line-clamp-3 text-[1.35rem] font-bold leading-snug text-slate-900 underline underline-offset-2 transition hover:text-blue-600 dark:text-white sm:text-[1.45rem]">
                             {item.title}
                           </p>
                           <p className="mt-2 text-xs font-medium text-slate-500 dark:text-slate-400">
@@ -468,12 +463,12 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                           <img
                             src={item.featured_image_url}
                             alt=""
-                            className="h-16 w-16 rounded-xl object-cover"
+                            className="h-20 w-[88px] rounded-md object-cover"
                             loading="lazy"
                           />
                         ) : (
                           <div
-                            className={`h-16 w-16 rounded-xl ${
+                            className={`h-20 w-[88px] rounded-md ${
                               index % 3 === 0
                                 ? "bg-[linear-gradient(120deg,#0369a1_0%,#22d3ee_100%)]"
                                 : index % 3 === 1
