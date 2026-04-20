@@ -332,7 +332,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
             </div>
           </div>
 
-          <aside className="space-y-8">
+          <aside className="space-y-8 lg:sticky lg:top-24 lg:self-start">
             <section className="p-0 sm:p-0">
               <div className="mb-5 flex items-center justify-between">
                 <h3 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Related Post</h3>
