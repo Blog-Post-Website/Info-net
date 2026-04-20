@@ -25,24 +25,6 @@ type MarkdownCodeProps = ComponentPropsWithoutRef<"code"> & {
 
 type MarkdownImageProps = ComponentPropsWithoutRef<"img">;
 
-function splitContentForHero(content: string): { lead: string; rest: string } {
-  const blocks = content
-    .split(/\n\s*\n/)
-    .map((block) => block.trim())
-    .filter(Boolean);
-
-  if (blocks.length <= 1) {
-    return { lead: content, rest: "" };
-  }
-
-  // Keep the hero-side intro intentionally short to avoid a tall first row that leaves
-  // a large blank area under the image before the main content continues below.
-  const lead = blocks[0];
-  const rest = blocks.slice(1).join("\n\n");
-
-  return { lead, rest };
-}
-
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params;
 
@@ -137,7 +119,6 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
   }
 
   const hasHeroImage = typeof post.featured_image_url === "string" && post.featured_image_url.trim().length > 0;
-  const { lead: leadContent, rest: remainingContent } = splitContentForHero(post.content);
 
   const markdownComponents = {
     h1: ({ ...props }) => <h1 className="mt-10 mb-5 text-3xl font-bold leading-tight text-gray-900 dark:text-white" {...props} />,
@@ -249,9 +230,9 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
       <div className="mx-auto max-w-[92rem] px-4 py-10 sm:px-6 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,2.8fr)_minmax(320px,0.85fr)]">
           <div>
-            <header className={hasHeroImage ? "grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]" : ""}>
+            <section className="overflow-hidden">
               {hasHeroImage ? (
-                <div className="self-start overflow-hidden rounded-2xl border border-gray-200 bg-gray-100 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+                <div className="mb-6 overflow-hidden rounded-2xl border border-gray-200 bg-gray-100 shadow-sm dark:border-gray-800 dark:bg-gray-900 lg:float-left lg:mb-8 lg:mr-8 lg:w-[52%] lg:max-w-[52%]">
                   <img
                     src={post.featured_image_url as string}
                     alt={post.title}
@@ -260,34 +241,25 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                 </div>
               ) : null}
 
-              <div className={hasHeroImage ? "self-start" : ""}>
-                <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-white sm:text-5xl">
-                  {post.title}
-                </h1>
-                <p className="mt-3 text-sm font-medium text-slate-500 dark:text-slate-400">
-                  <time dateTime={post.published_at || post.created_at}>
-                    {new Date(post.published_at || post.created_at).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </time>
-                </p>
+              <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-white sm:text-5xl">
+                {post.title}
+              </h1>
+              <p className="mt-3 text-sm font-medium text-slate-500 dark:text-slate-400">
+                <time dateTime={post.published_at || post.created_at}>
+                  {new Date(post.published_at || post.created_at).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </time>
+              </p>
 
-
-                <article className="prose mt-8 max-w-none dark:prose-invert prose-a:no-underline">
-                  <ReactMarkdown components={markdownComponents}>{leadContent}</ReactMarkdown>
-                </article>
-              </div>
-            </header>
-
-            {remainingContent ? (
-              <article className="prose mt-10 max-w-none dark:prose-invert prose-a:no-underline">
-                <ReactMarkdown components={markdownComponents}>{remainingContent}</ReactMarkdown>
+              <article className="prose mt-8 max-w-none dark:prose-invert prose-a:no-underline">
+                <ReactMarkdown components={markdownComponents}>{post.content}</ReactMarkdown>
               </article>
-            ) : null}
+            </section>
 
-            <div className="mt-12 space-y-6">
+            <div className="clear-both mt-12 space-y-6">
                 <PostEngagement postId={post.id} postTitle={post.title} postSlug={post.slug} siteUrl={siteUrl} />
 
                 <section className="rounded-[28px] border border-slate-200 bg-[#101826] p-6 text-white shadow-[0_18px_45px_rgba(15,23,42,0.14)]">
