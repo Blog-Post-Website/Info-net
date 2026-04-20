@@ -216,7 +216,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
   };
 
   return (
-    <div className="min-h-screen bg-[#f3f4f6] text-slate-900 dark:bg-gray-950">
+    <div className="min-h-screen bg-[#f3f4f6] font-sans text-slate-900 dark:bg-gray-950">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
@@ -249,7 +249,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                 </time>
               </p>
 
-              <article className="prose mt-8 max-w-none dark:prose-invert prose-a:no-underline">
+              <article className="prose mt-8 max-w-none dark:prose-invert prose-a:no-underline [&_*]:font-sans">
                 <ReactMarkdown components={markdownComponents}>{post.content}</ReactMarkdown>
               </article>
             </section>
@@ -343,20 +343,8 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                     <article key={item.id} className="py-4 first:pt-0 last:pb-0">
                       <FormLink
                         href={`/blog/${item.slug}`}
-                        className="grid w-full cursor-pointer grid-cols-[1fr_88px] items-start gap-4 text-left"
+                        className="grid w-full cursor-pointer grid-cols-[88px_1fr] items-start gap-4 text-left"
                       >
-                        <div>
-                          <p className="line-clamp-3 text-[1.35rem] font-bold leading-snug text-slate-900 underline underline-offset-2 transition hover:text-blue-600 dark:text-white sm:text-[1.45rem]">
-                            {item.title}
-                          </p>
-                          <p className="mt-2 text-xs font-medium text-slate-500 dark:text-slate-400">
-                            InfoNet • {new Date(item.published_at || item.created_at).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "2-digit",
-                              year: "numeric",
-                            })}
-                          </p>
-                        </div>
                         {item.featured_image_url ? (
                           <img
                             src={item.featured_image_url}
@@ -375,6 +363,24 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                             }`}
                           />
                         )}
+                        <div>
+                          <p className="line-clamp-3 text-[1.35rem] font-bold leading-snug text-slate-900 underline underline-offset-2 transition hover:text-blue-600 dark:text-white sm:text-[1.45rem]">
+                            {item.title}
+                          </p>
+                          <p className="mt-2 inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.06em] text-slate-700 dark:text-slate-300">
+                            <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current stroke-[2]" aria-hidden="true">
+                              <circle cx="12" cy="12" r="9" />
+                              <path d="M12 7v5l3 2" strokeLinecap="round" />
+                            </svg>
+                            {new Date(item.published_at || item.created_at)
+                              .toLocaleDateString("en-US", {
+                                month: "long",
+                                day: "numeric",
+                                year: "numeric",
+                              })
+                              .toUpperCase()}
+                          </p>
+                        </div>
                       </FormLink>
                     </article>
                   ))
@@ -394,20 +400,8 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                     <article key={item.id} className="py-4 first:pt-0 last:pb-0">
                       <FormLink
                         href={`/blog/${item.slug}`}
-                        className="grid w-full cursor-pointer grid-cols-[1fr_88px] items-start gap-4 text-left"
+                        className="grid w-full cursor-pointer grid-cols-[88px_1fr] items-start gap-4 text-left"
                       >
-                        <div>
-                          <p className="line-clamp-3 text-[1.35rem] font-bold leading-snug text-slate-900 underline underline-offset-2 transition hover:text-blue-600 dark:text-white sm:text-[1.45rem]">
-                            {item.title}
-                          </p>
-                          <p className="mt-2 text-xs font-medium text-slate-500 dark:text-slate-400">
-                            InfoNet • {new Date(item.published_at || item.created_at).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "2-digit",
-                              year: "numeric",
-                            })}
-                          </p>
-                        </div>
                         {item.featured_image_url ? (
                           <img
                             src={item.featured_image_url}
@@ -426,6 +420,24 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                             }`}
                           />
                         )}
+                        <div>
+                          <p className="line-clamp-3 text-[1.35rem] font-bold leading-snug text-slate-900 underline underline-offset-2 transition hover:text-blue-600 dark:text-white sm:text-[1.45rem]">
+                            {item.title}
+                          </p>
+                          <p className="mt-2 inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.06em] text-slate-700 dark:text-slate-300">
+                            <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current stroke-[2]" aria-hidden="true">
+                              <circle cx="12" cy="12" r="9" />
+                              <path d="M12 7v5l3 2" strokeLinecap="round" />
+                            </svg>
+                            {new Date(item.published_at || item.created_at)
+                              .toLocaleDateString("en-US", {
+                                month: "long",
+                                day: "numeric",
+                                year: "numeric",
+                              })
+                              .toUpperCase()}
+                          </p>
+                        </div>
                       </FormLink>
                     </article>
                   ))
@@ -445,20 +457,8 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                     <article key={item.id} className="py-4 first:pt-0 last:pb-0">
                       <FormLink
                         href={`/blog/${item.slug}`}
-                        className="grid w-full cursor-pointer grid-cols-[1fr_88px] items-start gap-4 text-left"
+                        className="grid w-full cursor-pointer grid-cols-[88px_1fr] items-start gap-4 text-left"
                       >
-                        <div>
-                          <p className="line-clamp-3 text-[1.35rem] font-bold leading-snug text-slate-900 underline underline-offset-2 transition hover:text-blue-600 dark:text-white sm:text-[1.45rem]">
-                            {item.title}
-                          </p>
-                          <p className="mt-2 text-xs font-medium text-slate-500 dark:text-slate-400">
-                            InfoNet • {new Date(item.published_at || item.created_at).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "2-digit",
-                              year: "numeric",
-                            })}
-                          </p>
-                        </div>
                         {item.featured_image_url ? (
                           <img
                             src={item.featured_image_url}
@@ -477,6 +477,24 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
                             }`}
                           />
                         )}
+                        <div>
+                          <p className="line-clamp-3 text-[1.35rem] font-bold leading-snug text-slate-900 underline underline-offset-2 transition hover:text-blue-600 dark:text-white sm:text-[1.45rem]">
+                            {item.title}
+                          </p>
+                          <p className="mt-2 inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.06em] text-slate-700 dark:text-slate-300">
+                            <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current stroke-[2]" aria-hidden="true">
+                              <circle cx="12" cy="12" r="9" />
+                              <path d="M12 7v5l3 2" strokeLinecap="round" />
+                            </svg>
+                            {new Date(item.published_at || item.created_at)
+                              .toLocaleDateString("en-US", {
+                                month: "long",
+                                day: "numeric",
+                                year: "numeric",
+                              })
+                              .toUpperCase()}
+                          </p>
+                        </div>
                       </FormLink>
                     </article>
                   ))
